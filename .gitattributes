@@ -1,0 +1,21 @@
+# Normaliza fim de linha. Sem isto, o Windows grava CRLF no repositorio e
+# quem clonar no Linux ou no macOS recebe scripts que nao executam.
+* text=auto eol=lf
+
+# O launcher do Gradle e script de shell: CRLF quebra ele fora do Windows.
+gradlew text eol=lf
+*.sh     text eol=lf
+
+# Estes sao do Windows e precisam de CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios: o git nao deve tentar normalizar nem exibir diff de texto.
+*.jar binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.pdf binary
+*.apk binary
+*.mp4 binary
+*.keystore binary

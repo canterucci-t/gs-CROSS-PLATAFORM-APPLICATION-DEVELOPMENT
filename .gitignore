@@ -1,0 +1,43 @@
+# --------------------------------------------------- gerado pelo Gradle
+build/
+.gradle/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+*.hprof
+
+# ------------------------------------------- especifico de cada maquina
+# Caminho do SDK de quem clonou. O Android Studio recria no primeiro open.
+local.properties
+
+# ------------------------------------------------------------- IDE e SO
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------- chaves e segredos
+# Nenhuma chave existe neste projeto (o app nao tem rede nem credencial),
+# mas a regra fica declarada: nada de assinatura entra no repositorio.
+*.keystore
+*.jks
+keystore.properties
+
+# NAO ignoramos entrega/: o PDF e o APK sao entregaveis, e vao
+# versionados de proposito. Os APKs que o Gradle gera ficam em build/,
+# que ja esta ignorado acima.
+
+# O video de demonstracao (25 MB) nao entra no repositorio: e binario que o
+# git nunca compacta e que nao se le em diff. Ele esta publicado em
+# https://youtube.com/shorts/3ebA_WhBFpw e o README aponta para la. O arquivo
+# continua existindo na pasta entrega/ local, so nao e versionado.
+entrega/*.mp4
+
+# Fora do repositorio: ferramentas internas que gravaram e montaram o video.
+# O enunciado (Etapa 7, p. 24-25) pede PDF, repositorio de codigo, APK, dados
+# sinteticos documentados, evidencias de qualidade, registro de uso de IA,
+# video demonstrativo e referencias - nada disso depende destes scripts.
+# Eles continuam na pasta local, so nao sao versionados.
+tools/video/
+docs/ROTEIRO_VIDEO.md

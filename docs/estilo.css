@@ -1,0 +1,137 @@
+/* Folha de estilo do documento da GS2026.2 - pensada para impressao em PDF. */
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+
+:root {
+  --petroleo: #0E5C56;
+  --petroleo-escuro: #00312D;
+  --terra: #5A4634;
+  --cinza: #3F4945;
+  --cinza-claro: #E2EAE6;
+  --borda: #C9D6D1;
+  --critico: #8A1B0C;
+  --atencao: #6B4300;
+  --info: #0B3C6B;
+  --ok: #0B4A32;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.5;
+  color: #17201D;
+  margin: 0;
+}
+
+h1, h2, h3, h4 { color: var(--petroleo-escuro); line-height: 1.25; }
+h1 { font-size: 20pt; margin: 0 0 4pt; }
+h2 {
+  font-size: 15pt;
+  margin: 22pt 0 8pt;
+  padding-bottom: 4pt;
+  border-bottom: 2.5pt solid var(--petroleo);
+  page-break-after: avoid;
+}
+h3 { font-size: 12pt; margin: 14pt 0 5pt; page-break-after: avoid; }
+h4 { font-size: 10.5pt; margin: 10pt 0 4pt; color: var(--terra); page-break-after: avoid; }
+p { margin: 0 0 7pt; text-align: justify; }
+
+a { color: var(--petroleo); }
+code, .mono {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 9pt;
+  background: var(--cinza-claro);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+/* ---------------------------------------------------------------- capa */
+.capa {
+  height: 247mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  page-break-after: always;
+}
+.capa .faixa {
+  font-size: 9pt;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--petroleo);
+  font-weight: 700;
+}
+.capa h1 { font-size: 30pt; margin: 14pt 0 6pt; }
+.capa .sub { font-size: 13pt; color: var(--cinza); margin-bottom: 26pt; }
+.capa .regua { width: 70mm; height: 3pt; background: var(--petroleo); margin: 0 auto 26pt; }
+.capa .equipe { margin-top: 10pt; }
+.capa .equipe div { font-size: 12pt; margin: 3pt 0; }
+.capa .rm { color: var(--petroleo); font-weight: 700; font-family: Consolas, monospace; }
+.capa .rodape { margin-top: 32pt; font-size: 10pt; color: var(--cinza); }
+
+/* -------------------------------------------------------------- tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 7pt 0 12pt;
+  font-size: 9.5pt;
+  page-break-inside: auto;
+}
+tr { page-break-inside: avoid; page-break-after: auto; }
+thead { display: table-header-group; }
+th, td { border: 0.7pt solid var(--borda); padding: 5pt 7pt; vertical-align: top; text-align: left; }
+th { background: var(--petroleo); color: #fff; font-weight: 600; }
+tbody tr:nth-child(even) { background: #F4F8F6; }
+td.num { text-align: right; font-family: Consolas, monospace; white-space: nowrap; }
+.tab-compacta { font-size: 9pt; }
+
+/* ---------------------------------------------------------------- caixas */
+.caixa {
+  border-left: 3.5pt solid var(--petroleo);
+  background: #F2F8F6;
+  padding: 8pt 11pt;
+  margin: 9pt 0;
+  page-break-inside: avoid;
+}
+.caixa.alerta { border-left-color: var(--atencao); background: #FDF6E8; }
+.caixa.critica { border-left-color: var(--critico); background: #FBEEEC; }
+.caixa > p:last-child { margin-bottom: 0; }
+.caixa .titulo { font-weight: 700; color: var(--petroleo-escuro); display: block; margin-bottom: 3pt; }
+
+.selo {
+  display: inline-block;
+  font-size: 8.5pt;
+  font-weight: 700;
+  padding: 1pt 7pt;
+  border-radius: 9pt;
+  margin-left: 6pt;
+  vertical-align: 2pt;
+}
+.selo.pontos { background: var(--petroleo); color: #fff; }
+.ok   { color: var(--ok);      font-weight: 700; }
+.nok  { color: var(--critico); font-weight: 700; }
+.melhor { color: var(--ok); font-weight: 700; }
+.igual  { color: var(--cinza); font-weight: 700; }
+
+ul, ol { margin: 0 0 8pt; padding-left: 18pt; }
+li { margin-bottom: 3pt; }
+
+/* --------------------------------------------------------------- figuras */
+figure { margin: 10pt 0 14pt; page-break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; border: 0.7pt solid var(--borda); border-radius: 4pt; }
+figure.tela img { max-height: 118mm; width: auto; }
+figcaption { font-size: 8.5pt; color: var(--cinza); margin-top: 4pt; font-style: italic; }
+.galeria { display: flex; gap: 6mm; justify-content: center; flex-wrap: wrap; }
+.galeria figure { flex: 0 1 46%; margin: 6pt 0; }
+.galeria figure img { max-height: 95mm; }
+
+svg { max-width: 100%; height: auto; }
+
+.quebra { page-break-before: always; }
+.nao-quebra { page-break-inside: avoid; }
+
+/* ---------------------------------------------------------------- sumario */
+.sumario ol { list-style: none; padding-left: 0; counter-reset: etapa; }
+.sumario li { padding: 3pt 0; border-bottom: 0.5pt dotted var(--borda); font-size: 10.5pt; }
+.sumario .pts { float: right; color: var(--petroleo); font-weight: 700; }

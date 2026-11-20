@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema base somente para a janela: as cores reais vem do MaterialTheme
+         em Compose (ui/theme/Theme.kt), que e a fonte unica de verdade. -->
+    <style name="Theme.Tid" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

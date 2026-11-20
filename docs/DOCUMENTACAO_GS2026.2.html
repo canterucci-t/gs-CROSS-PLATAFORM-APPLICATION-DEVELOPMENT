@@ -1,0 +1,1689 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>GS2026.2 — Territory Intelligence Dashboard</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<!-- ============================================================= CAPA -->
+<section class="capa">
+  <div class="faixa">FIAP · Graduação · CitizenTech · Transformação Digital</div>
+  <h1>Territory Intelligence Dashboard</h1>
+  <div class="sub">Painel de Inteligência Territorial para Antecipação de<br>Problemas e Apoio à Decisão Humana</div>
+  <div class="regua"></div>
+  <div><strong>GS2026.2 — Global Solution</strong></div>
+  <div>Cross-Platform Application Development</div>
+  <div style="margin-top:6pt">Android nativo · Kotlin · Jetpack Compose</div>
+
+  <div class="equipe">
+    <div style="font-size:10pt;color:#3F4945;margin-bottom:8pt;letter-spacing:1px">INTEGRANTES</div>
+    <div><span class="rm">563651</span> &nbsp; Henrique Nogueira Boscoli</div>
+    <div><span class="rm">565566</span> &nbsp; Tomazzo Canterucci</div>
+    <div><span class="rm">563578</span> &nbsp; João Henrique Queiroz Gil</div>
+  </div>
+
+  <div class="rodape">
+    Recorte principal: <strong>energia</strong> (curva de carga e risco de sobrecarga),<br>
+    com água, clima, resíduos e serviços no mesmo painel.
+  </div>
+</section>
+
+<!-- ========================================================== SUMÁRIO -->
+<section class="sumario">
+  <h2 style="margin-top:0">Sumário</h2>
+  <ol>
+    <li>Etapa 1 — Visão do Negócio <span class="pts">1,0</span></li>
+    <li>Etapa 2 — Arquitetura da Solução <span class="pts">2,5</span></li>
+    <li>Etapa 3 — Estado e Persistência de Dados <span class="pts">2,0</span></li>
+    <li>Etapa 4 — Identidade Visual e Componentes Reutilizáveis <span class="pts">1,0</span></li>
+    <li>Etapa 5 — Alertas Preditivos e Decisão Humana <span class="pts">1,0</span></li>
+    <li>Etapa 6 — Decisões Arquiteturais (ADR) <span class="pts">0,5</span></li>
+    <li>Etapa 7 — Qualidade e Entrega do App <span class="pts">1,5</span></li>
+    <li>Etapa 8 — Uso Responsável de IA e Roteiro de Defesa <span class="pts">0,5</span></li>
+    <li>Checklist final e Referências</li>
+  </ol>
+
+  <div class="caixa">
+    <span class="titulo">O que foi entregue, em uma frase</span>
+    <p>Um app Android funcional (APK release instalável, 7,46 MB) que lê uma base territorial
+    local, calcula indicadores, projeta risco para as próximas 48 h com um método explicável,
+    exibe <strong>todo alerta junto da sua justificativa</strong>, registra a decisão humana com
+    responsável e data, e degrada com clareza quando os dados faltam, vencem ou a permissão é
+    negada. Tudo offline.</p>
+  </div>
+</section>
+
+<!-- ========================================================== ETAPA 1 -->
+<section class="quebra">
+<h2>Etapa 1 — Visão do Negócio <span class="selo pontos">1,0 ponto</span></h2>
+
+<h3>1.1 Objetivo, problema, público-alvo e benefícios</h3>
+<table>
+  <tr><th style="width:26%">Elemento</th><th>Preenchimento da equipe</th></tr>
+  <tr>
+    <td><strong>Objetivo da solução</strong></td>
+    <td>Reunir em um único painel os indicadores de água, energia, clima, resíduos e serviços de
+    um território, <strong>antecipar</strong> problemas com 48 h de antecedência e entregar cada
+    alerta com a justificativa que o originou, para que uma pessoa responsável decida o que
+    fazer — e tenha essa decisão registrada.</td>
+  </tr>
+  <tr>
+    <td><strong>Problema a ser resolvido</strong></td>
+    <td>Hoje os dados territoriais estão <em>dispersos</em> (fontes e formatos diferentes), a
+    análise é <em>reativa</em> (o problema é percebido depois de acontecer), as informações
+    chegam <em>sem justificativa</em> (não se sabe por que algo é um risco) e não há
+    <em>critério para priorizar</em> entre vários problemas simultâneos. O resultado é decisão
+    por relato informal e planilha montada às pressas.</td>
+  </tr>
+  <tr>
+    <td><strong>Público-alvo</strong></td>
+    <td><strong>Usuário principal:</strong> o Gestor Territorial (subprefeitura, defesa civil,
+    liderança comunitária) que precisa decidir rápido, muitas vezes em campo, sem internet e em
+    um celular simples.<br>
+    <strong>Também usam:</strong> moradores (consultam e entendem o risco do seu bairro) e o
+    administrador/curador de dados (gerencia territórios, fontes e limiares).<br>
+    <strong>Beneficiada:</strong> a população do território monitorado.</td>
+  </tr>
+  <tr>
+    <td><strong>Benefícios esperados</strong></td>
+    <td>Antecipação (agir antes do problema atingir a população), transparência (todo alerta
+    mostra dado, regra, período e fonte), priorização (níveis informativo/atenção/crítico com
+    confiança declarada) e rastreabilidade (histórico de quem decidiu o quê e por quê).</td>
+  </tr>
+</table>
+
+<h3>1.2 Benefícios da solução por público</h3>
+<table>
+  <tr><th>Para moradores</th><th>Para gestores e lideranças</th><th>Para a comunidade</th></tr>
+  <tr>
+    <td>Informação clara sobre o risco do seu território, com o motivo explicado em texto
+    (“o consumo cresceu 11,5% na semana e a projeção alcança 116% do limiar”) e não apenas uma
+    cor na tela.</td>
+    <td>Visão consolidada de 5 temas em um painel, alertas ordenados por gravidade, com nível de
+    confiança para separar o que exige ação do que exige só acompanhamento.</td>
+    <td>Problemas tratados antes de afetarem a população e um registro público do que foi
+    decidido, por quem e quando — base para prestação de contas.</td>
+  </tr>
+</table>
+
+<h3>1.3 Cenário atual (As-Is) e cenário futuro (To-Be)</h3>
+<table>
+  <tr><th style="width:50%">Cenário atual (As-Is)</th><th>Cenário futuro (To-Be)</th></tr>
+  <tr>
+    <td>
+      <ul>
+        <li>Dados de água, energia, clima, resíduos e serviços em fontes e formatos diferentes.</li>
+        <li>Problema percebido <strong>depois</strong> de ocorrer.</li>
+        <li>Decisão apoiada em relato informal ou análise manual demorada.</li>
+        <li>Nenhum registro de quem decidiu o quê, nem com qual informação.</li>
+        <li>Sem conectividade, não há consulta possível.</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Base única no aparelho, com origem e licença documentadas.</li>
+        <li>Projeção para 48 h com nível, confiança e <strong>justificativa obrigatória</strong>.</li>
+        <li>Decisão humana registrada (acatar / adiar / descartar) com responsável e observação.</li>
+        <li>Histórico consultável e apagável pelo próprio usuário (LGPD).</li>
+        <li>Offline é o regime normal: o painel abre sem internet.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<h3>1.4 Papéis dos usuários</h3>
+<table>
+  <tr><th style="width:24%">Papel</th><th>Responsabilidades</th><th style="width:30%">Onde aparece no app</th></tr>
+  <tr><td><strong>Morador</strong></td>
+      <td>Consulta indicadores e alertas do seu território, lê a justificativa e entende o nível
+      de confiança.</td>
+      <td>Painel, Detalhe do Indicador, Detalhe do Alerta</td></tr>
+  <tr><td><strong>Gestor Territorial</strong></td>
+      <td>Analisa o gráfico e o alerta, avalia a justificativa, decide (acatar, adiar ou
+      descartar), registra a observação e pode notificar a equipe.</td>
+      <td>Detalhe do Alerta, DecisionSheet, Histórico de Decisões</td></tr>
+  <tr><td><strong>Administrador / Curador de Dados</strong></td>
+      <td>Define o território padrão, escolhe os temas monitorados, confere os limiares de
+      referência e a origem/licença das fontes.</td>
+      <td>Configurações</td></tr>
+</table>
+
+<h3>1.5 Princípios de decisão humana</h3>
+<table>
+  <tr><th style="width:26%">Princípio</th><th>Como o app atende — e onde isso está no código</th></tr>
+  <tr><td><strong>Justificativa obrigatória</strong></td>
+      <td>O tipo <code>Alert</code> só existe com um campo <code>justification</code> preenchido:
+      o modelo de domínio <em>torna impossível</em> criar um alerta sem justificativa. O
+      <code>JustificationPanel</code> exibe 8 variáveis com valor, a regra aplicada, o período e a
+      fonte.</td></tr>
+  <tr><td><strong>Transparência da incerteza</strong></td>
+      <td>Toda tela mostra a data da última leitura, o tempo relativo (“há 4 min”) e a origem
+      (“Dado sintético”). O alerta mostra a confiança em % e a aderência do ajuste (R²).
+      Quando o app <strong>não</strong> emite alerta, ele diz por quê.</td></tr>
+  <tr><td><strong>Humano no circuito</strong></td>
+      <td>Alerta crítico recebe <code>requiresHumanConfirmation = true</code>: a tela avisa que
+      medidas de alto impacto (racionamento, interrupção de serviço, evacuação) não são
+      executadas pelo app, e o registro da decisão exige observação escrita.</td></tr>
+  <tr><td><strong>Rastreabilidade</strong></td>
+      <td><code>DecisionEntity</code> no Room grava alerta, território, responsável, ação,
+      observação e data. O <code>RegisterDecisionUseCase</code> recusa decisão sem responsável
+      identificado (mínimo 3 letras).</td></tr>
+  <tr><td><strong>Privacidade e ética</strong></td>
+      <td>Base 100% sintética, sem dado pessoal real. Nada sai do aparelho. O usuário apaga o
+      histórico de decisões com um toque (tela Configurações e Histórico).</td></tr>
+</table>
+</section>
+
+<!-- ========================================================= ETAPA 1.6 -->
+<section>
+<h3>1.6 Dados e indicadores monitorados</h3>
+<table class="tab-compacta">
+  <tr><th>Tema</th><th>Fonte</th><th>Indicador no app</th><th>Limiares</th><th>Exemplo de alerta gerado</th></tr>
+  <tr><td><strong>Energia</strong><br><em>recorte principal</em></td>
+      <td>Base sintética de curva de carga, calibrada na ordem de grandeza de publicações
+      abertas do ONS</td>
+      <td>Carga de energia (kWh/h), leitura horária</td>
+      <td>Atenção 900<br>Crítico 1150</td>
+      <td>“Atenção: risco de sobrecarga de energia em Jardim das Flores nas próximas 48 h”</td></tr>
+  <tr><td><strong>Clima</strong></td>
+      <td>Base sintética de temperatura, ordem de grandeza do INMET</td>
+      <td>Temperatura do ar (°C)</td>
+      <td>Atenção 34<br>Crítico 38</td>
+      <td>“Crítico: risco de calor extremo em Jardim das Flores nas próximas 48 h”</td></tr>
+  <tr><td><strong>Água</strong></td>
+      <td>Base sintética de vazão, ordem de grandeza do SNIS</td>
+      <td>Vazão de água distribuída (L/s)</td>
+      <td>Atenção 48<br>Crítico 58</td>
+      <td>“Atenção: risco de queda de pressão de água…”</td></tr>
+  <tr><td><strong>Resíduos</strong></td>
+      <td>Base sintética de coleta por rota</td>
+      <td>Resíduos acumulados (t)</td>
+      <td>Atenção 18<br>Crítico 24</td>
+      <td>“Informativo: risco de acúmulo de resíduos…”</td></tr>
+  <tr><td><strong>Serviços</strong></td>
+      <td>Base sintética de demanda de atendimento</td>
+      <td>Tempo de espera no atendimento (min)</td>
+      <td>Atenção 35<br>Crítico 50</td>
+      <td>“Atenção: risco de fila no atendimento…”</td></tr>
+</table>
+<p><strong>Territórios:</strong> Jardim das Flores (bairro, território padrão), Centro (bairro) e
+Sítio Bom Retiro (área rural). <strong>Volume:</strong> 7.575 leituras horárias cobrindo 21 dias
+(5 indicadores × 3 territórios × 505 horas).</p>
+
+<h3>1.7 Contexto, restrições e jornada</h3>
+<table>
+  <tr><th style="width:22%">Pergunta de negócio</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>O que vale construir?</strong></td>
+      <td>O recorte viável para o prazo é <strong>sobrecarga de energia</strong>: tem ciclo
+      diário claro, limiar de referência objetivo e consequência direta (queda de energia em
+      onda de calor). Os outros quatro temas entram com o mesmo motor de previsão, provando que a
+      arquitetura é genérica sem custar mais trabalho.</td></tr>
+  <tr><td><strong>Para quem?</strong></td>
+      <td>Usuário principal: <strong>Gestor Territorial</strong>. Situação real de uso: em campo,
+      com pressa, <strong>sem internet</strong>, em aparelho simples e com a tela no sol. Daí as
+      decisões de alvo de toque de 48 dp, contraste alto, offline-first e texto que cresce com a
+      fonte do sistema.</td></tr>
+  <tr><td><strong>Sob quais restrições?</strong></td>
+      <td>Trio, prazo de um semestre, plataforma Android com Kotlin e Compose,
+      <code>minSdk 24</code> (Android 7.0, cobre aparelhos antigos) e
+      <code>targetSdk 36</code>. Sem servidor: a base precisa caber no APK.</td></tr>
+  <tr><td><strong>Com qual risco?</strong></td>
+      <td><strong>(1) Falso positivo</strong> — alerta que não se confirma destrói a confiança;
+      tratado com o corte de aderência (R² &lt; 0,20 não emite alerta).
+      <strong>(2) Dado ausente ou vencido</strong> — tratado com política de validade de 24 h e
+      suspensão dos alertas, sempre com aviso na tela.
+      <strong>(3) Permissão negada</strong> — tratada com plano B (o alerta permanece no painel).
+      <strong>(4) iOS fora do escopo</strong> — assumido e justificado no ADR-001.</td></tr>
+  <tr><td><strong>Qual a jornada principal?</strong></td>
+      <td>1) Abrir o app → painel do território padrão já montado (offline).<br>
+      2) Ler a faixa de origem e data da última atualização.<br>
+      3) Ver os alertas ativos ordenados por gravidade (crítico primeiro).<br>
+      4) Tocar no alerta → ler a justificativa completa (variáveis, regra, período, fonte,
+      confiança) e o gráfico com histórico, limiares e projeção.<br>
+      5) Registrar a decisão: acatar, adiar ou descartar, com responsável e observação.<br>
+      6) Opcional: notificar a equipe (notificação local).<br>
+      <strong>Quando faltam dados:</strong> o painel não fica em branco — mostra o estado vazio
+      com o motivo e um botão “Tentar novamente”; quando os dados estão vencidos, mostra a faixa
+      de aviso e declara que os alertas estão <em>suspensos</em>.</td></tr>
+</table>
+</section>
+
+<section class="quebra">
+<h3>1.8 Requisitos Funcionais</h3>
+<table>
+  <tr><th style="width:8%">ID</th><th>Descrição</th><th style="width:12%">Prioridade</th><th style="width:22%">Onde está implementado</th></tr>
+  <tr><td><strong>RF01</strong></td>
+      <td>Exibir, por território, os indicadores dos temas monitorados com valor atual, unidade,
+      variação semanal, status e data da última leitura; e o gráfico de série temporal com
+      histórico, limiares de referência e faixa de projeção.</td>
+      <td><strong>Alta</strong></td>
+      <td><code>DashboardScreen</code>, <code>KpiCard</code>, <code>TrendChart</code></td></tr>
+  <tr><td><strong>RF02</strong></td>
+      <td>Gerar alerta preditivo para as próximas 48 h classificado em informativo, atenção ou
+      crítico, <strong>sempre acompanhado da justificativa</strong> (variáveis e valores, regra
+      aplicada, período analisado, fonte do dado e confiança).</td>
+      <td><strong>Alta</strong></td>
+      <td><code>ForecastEngine</code>, <code>AlertCard</code>, <code>JustificationPanel</code></td></tr>
+  <tr><td><strong>RF03</strong></td>
+      <td>Carregar a base territorial dos arquivos locais na primeira execução e ler os dados do
+      banco do dispositivo em todas as consultas, sem depender de rede.</td>
+      <td><strong>Alta</strong></td>
+      <td><code>SeedLoader</code>, <code>TidDao</code>, <code>TerritoryRepositoryImpl</code></td></tr>
+  <tr><td><strong>RF04</strong></td>
+      <td>Persistir localmente a série temporal, o território selecionado, os temas monitorados e
+      o histórico de decisões, mantendo tudo disponível após fechar o app.</td>
+      <td><strong>Alta</strong></td>
+      <td><code>TidDatabase</code> (Room), <code>PreferencesStore</code></td></tr>
+  <tr><td><strong>RF05</strong></td>
+      <td>Registrar a decisão humana sobre um alerta (acatar, adiar ou descartar) com
+      responsável, observação e data, e listá-la no histórico; alerta crítico exige observação
+      escrita. Nenhuma ação de alto impacto é executada pelo app.</td>
+      <td><strong>Alta</strong></td>
+      <td><code>DecisionSheet</code>, <code>RegisterDecisionUseCase</code>, <code>DecisionsScreen</code></td></tr>
+  <tr><td><strong>RF06</strong></td>
+      <td>Disparar notificação local do alerta mais grave usando recurso nativo do dispositivo,
+      pedindo a permissão no toque que precisa dela e tratando os três caminhos: concedida,
+      negada e indisponível — com plano B na tela.</td>
+      <td><strong>Média</strong></td>
+      <td><code>AlertNotifier</code>, <code>AndroidAlertNotifier</code></td></tr>
+  <tr><td><strong>RF07</strong></td>
+      <td>Permitir ao usuário trocar de território, ligar/desligar temas monitorados, consultar
+      limiares e origem/licença dos dados, e apagar o histórico de decisões (LGPD).</td>
+      <td>Média</td>
+      <td><code>SettingsScreen</code>, <code>TerritorySelector</code></td></tr>
+  <tr><td><strong>RF08</strong></td>
+      <td>Informar o motivo sempre que um indicador <strong>não</strong> gerar alerta (histórico
+      insuficiente, dado vencido, tendência não identificável ou projeção abaixo do limiar).</td>
+      <td>Média</td>
+      <td><code>ForecastEngine.Result.NotEmitted</code>, seção “Por que não geraram alerta”</td></tr>
+</table>
+
+<h3>1.9 Requisitos Não Funcionais — com meta, medida e prova</h3>
+<table class="tab-compacta">
+  <tr><th style="width:7%">ID</th><th style="width:16%">Atributo</th><th>Meta</th><th>Como foi medido</th><th style="width:20%">Resultado medido</th></tr>
+  <tr><td><strong>RNF01</strong></td><td>Desempenho</td>
+      <td>O painel fica pronto (dados lidos + previsão calculada para 5 indicadores) em
+      <strong>≤ 2.000 ms</strong> na versão release.</td>
+      <td>Marca <code>TID_PERF dashboard_ms</code> no logcat, emulador Pixel API 36, 5 execuções
+      frias e 8 mornas.</td>
+      <td class="ok">341 ms na 1ª abertura; 22 ms nas seguintes. Folga de 5,9×.</td></tr>
+  <tr><td><strong>RNF02</strong></td><td>Fluidez</td>
+      <td><strong>&lt; 5%</strong> de quadros perdidos e p95 do tempo de quadro
+      <strong>≤ 20 ms</strong> na rolagem do painel.</td>
+      <td><code>dumpsys gfxinfo</code> com <em>reset</em> + 16 rolagens roteirizadas.</td>
+      <td class="ok">3,57% de quadros perdidos; p95 = 18 ms (release).</td></tr>
+  <tr><td><strong>RNF03</strong></td><td>Acessibilidade</td>
+      <td>Contraste <strong>≥ 4,5:1</strong> em todos os pares de cor, alvos de toque
+      <strong>≥ 48 dp</strong>, fonte a <strong>200%</strong> sem corte, e nível de alerta nunca
+      comunicado só pela cor.</td>
+      <td>Cálculo WCAG dos 17 pares da paleta (claro e escuro);
+      <code>settings put system font_scale 2.0</code>; inspeção de <code>semantics</code>.</td>
+      <td class="ok">Pior par = 5,48:1. Fonte 200% sem corte. Todo nível tem ícone + rótulo.</td></tr>
+  <tr><td><strong>RNF04</strong></td><td>Disponibilidade offline</td>
+      <td>O app abre e opera <strong>100% sem rede</strong>; a base local tem política de
+      validade de 24 h e o app nunca alerta sobre dado vencido.</td>
+      <td>App executado com Wi-Fi e dados desligados; modo “Simular dados desatualizados” em
+      Configurações.</td>
+      <td class="ok">Sem permissão de INTERNET no manifesto. Dado vencido suspende os alertas com aviso.</td></tr>
+  <tr><td><strong>RNF05</strong></td><td>Confiabilidade</td>
+      <td><strong>Zero</strong> falhas no fluxo principal e cobertura de teste do motor de
+      previsão, inclusive dos casos em que ele <em>não</em> deve alertar.</td>
+      <td><code>logcat AndroidRuntime:E</code> no roteiro completo;
+      <code>gradlew :app:testDebugUnitTest</code>.</td>
+      <td class="ok">Nenhuma exceção registrada. 16/16 testes de unidade passando.</td></tr>
+  <tr><td><strong>RNF06</strong></td><td>Privacidade (LGPD)</td>
+      <td><strong>Nenhum</strong> dado pessoal real no repositório ou no aparelho; o usuário pode
+      apagar tudo que gerou.</td>
+      <td>Revisão do gerador de dados e do schema do Room; teste do botão de exclusão.</td>
+      <td class="ok">Base 100% sintética e documentada. Exclusão do histórico em um toque.</td></tr>
+</table>
+</section>
+
+<!-- ========================================================== ETAPA 2 -->
+<section class="quebra">
+<h2>Etapa 2 — Arquitetura da Solução <span class="selo pontos">2,5 pontos</span></h2>
+
+<h3>2.1 Abordagem adotada</h3>
+<table>
+  <tr><th style="width:9%">Escolha</th><th style="width:30%">Abordagem</th><th>Ideia central</th></tr>
+  <tr><td style="text-align:center;font-size:14pt">☒</td>
+      <td><strong>MVVM com fluxo unidirecional de dados</strong>, aplicado sobre o
+      <strong>blueprint em camadas</strong> da disciplina</td>
+      <td>O Compose observa o estado exposto pelo ViewModel por <code>StateFlow</code>: o estado
+      desce, os eventos sobem. As três camadas (interface, domínio, dados/nativo) conversam
+      apenas por contratos.</td></tr>
+  <tr><td style="text-align:center">☐</td><td>Arquitetura em Camadas pura</td>
+      <td>Adotada como base, mas sozinha não resolve o estado da tela.</td></tr>
+  <tr><td style="text-align:center">☐</td><td>Clean Architecture</td>
+      <td>Avaliada e descartada (ver abaixo).</td></tr>
+  <tr><td style="text-align:center">☐</td><td>Modular por Funcionalidade (Feature-First)</td>
+      <td>Avaliada e descartada (ver abaixo).</td></tr>
+</table>
+
+<div class="caixa">
+  <span class="titulo">Por que as duas juntas, e não uma só</span>
+  <p>As duas respondem a perguntas diferentes e não competem. O <strong>blueprint em camadas</strong>
+  responde “onde mora cada decisão” — e é ele que garante que trocar a base sintética por uma API
+  pública real não encoste no domínio. O <strong>MVVM com fluxo unidirecional</strong> responde
+  “quem é dono do estado da tela” — e é ele que garante que a rotação não perde dados e que a
+  interface não inventa regra. Dizer só “usamos MVVM” deixaria a primeira pergunta sem resposta.</p>
+</div>
+
+<h3>2.2 Justificativa da decisão</h3>
+<table>
+  <tr><th style="width:20%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Motivação</strong></td>
+      <td>O problema é <em>ler dado local, calcular risco e mostrar com justificativa</em>. A
+      parte difícil é a <strong>regra</strong> (quando alertar, quando calar, qual confiança), não
+      a tela. Separar o domínio em Kotlin puro permitiu testar essa regra na JVM, sem emulador:
+      são 16 testes que rodam em segundos. Com um trio e um semestre, isso é o que mais protege o
+      prazo. O MVVM com <code>StateFlow</code> é o padrão que a própria plataforma recomenda e
+      com o qual a equipe já trabalhou no semestre — não há custo de aprendizado.</td></tr>
+  <tr><td><strong>Benefícios</strong></td>
+      <td><strong>Testabilidade:</strong> o <code>ForecastEngine</code> não importa nada do
+      Android; os testes cobrem inclusive os casos de <em>não alertar</em>.<br>
+      <strong>Substituição:</strong> o domínio depende da interface
+      <code>TerritoryRepository</code>; trocar Room por API remota é escrever uma nova
+      implementação — nenhum caso de uso muda.<br>
+      <strong>Estado previsível:</strong> um <code>StateFlow&lt;UiState&lt;T&gt;&gt;</code> por
+      tela; carregando, vazio, erro, desatualizado e sucesso são estados declarados, não
+      <em>ifs</em> espalhados.<br>
+      <strong>Ciclo de vida:</strong> o estado vive no ViewModel e sobrevive à rotação de graça.</td></tr>
+  <tr><td><strong>Limitações</strong></td>
+      <td>Mais arquivos e mais indireção do que colocar a lógica na tela: 36 arquivos Kotlin
+      (~4.400 linhas) para 5 telas. Mapear entidade do Room para modelo de domínio é código
+      repetitivo. E, sem Hilt, o <code>AppContainer</code> é montado à mão — aceitável com um
+      repositório, mas não escalaria para dezenas de dependências.</td></tr>
+  <tr><td><strong>Alternativas descartadas</strong></td>
+      <td><strong>Clean Architecture completa</strong> — traria <em>mappers</em> e interfaces em
+      três níveis para um app de 5 telas; o custo de cerimônia não se paga no prazo. Pegamos dela
+      o que importa: a direção das dependências aponta para o domínio.<br>
+      <strong>Feature-First (módulos Gradle por tema)</strong> — energia, água e clima usam
+      <strong>o mesmo</strong> motor e o mesmo modelo; separá-los em módulos criaria duplicação e
+      aumentaria o tempo de build sem benefício real para um trio.<br>
+      <strong>Flutter / React Native</strong> — ver ADR-001 (Etapa 6). Em resumo: iOS está fora do
+      escopo declarado, a equipe tem experiência em Android e o app depende de recurso nativo
+      (notificação com permissão em tempo de execução); uma camada de <em>bridge</em> só
+      adicionaria risco. O domínio e os contratos entre camadas sobrevivem a uma troca futura de
+      framework — só a pasta <code>ui/</code> seria reescrita.</td></tr>
+</table>
+</section>
+
+<section>
+<h3>2.3 Blueprint: onde cada decisão mora</h3>
+<table class="tab-compacta">
+  <tr><th style="width:19%">Requisito</th><th>Interface (Compose)</th><th>Domínio (Kotlin puro)</th><th>Dados e Nativo</th></tr>
+  <tr><td>Exibir indicadores e gráficos</td>
+      <td><code>KpiCard</code> e <code>TrendChart</code> <em>descrevem</em> o estado recebido; não
+      calculam nada</td>
+      <td><code>GetDashboardUseCase</code> monta os KPIs a partir das leituras</td>
+      <td><code>TerritoryRepositoryImpl</code> lê do Room</td></tr>
+  <tr><td>Gerar alerta preditivo</td>
+      <td><code>AlertCard</code> + <code>JustificationPanel</code></td>
+      <td><code>ForecastEngine</code>: regra, nível, confiança e justificativa</td>
+      <td>Leituras históricas no Room (janela de 15 dias)</td></tr>
+  <tr><td>Dados ausentes ou vencidos</td>
+      <td><code>StateView</code> (vazio) e <code>WarningBanner</code> com a data da última
+      atualização</td>
+      <td>Define a validade (24 h) e <em>quando não emitir alerta</em></td>
+      <td><code>DataFailureMode</code> no repositório + data de atualização no banco</td></tr>
+  <tr><td>Falha ao ler os dados</td>
+      <td><code>StateView</code> (erro) com mensagem clara e botão “Tentar novamente”</td>
+      <td><code>UiState.Error</code> como estado declarado; política de degradar</td>
+      <td><code>runCatching</code> na leitura do Room, exceção traduzida em mensagem</td></tr>
+  <tr><td>Notificar alerta crítico</td>
+      <td>Pede a permissão no toque que precisa dela; exibe o plano B se negada</td>
+      <td>Contrato <code>AlertNotifier</code> + <code>NotifyResult</code> (enviado / negado /
+      indisponível)</td>
+      <td><code>AndroidAlertNotifier</code>: único ponto que conhece
+      <code>NotificationManager</code></td></tr>
+  <tr><td>Registrar decisão humana</td>
+      <td><code>DecisionSheet</code> com ação, responsável e observação</td>
+      <td><code>RegisterDecisionUseCase</code> valida e cria o registro</td>
+      <td><code>DecisionEntity</code> persistida no Room</td></tr>
+</table>
+
+<h3>2.4 Diagrama de contexto e fluxo de dados</h3>
+<figure>
+<svg viewBox="0 0 720 430" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="seta" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#3F4945"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="720" height="430" fill="#FFFFFF"/>
+
+  <!-- Pessoas -->
+  <text x="12" y="20" font-size="11" font-weight="700" fill="#5A4634">PESSOAS</text>
+  <rect x="12" y="34" width="132" height="54" rx="8" fill="#F0E6D8" stroke="#5A4634" stroke-width="1.3"/>
+  <text x="78" y="56" font-size="12" font-weight="700" text-anchor="middle" fill="#2B1F10">Morador</text>
+  <text x="78" y="73" font-size="9.5" text-anchor="middle" fill="#5A4634">consulta e entende</text>
+
+  <rect x="12" y="104" width="132" height="54" rx="8" fill="#F0E6D8" stroke="#5A4634" stroke-width="1.3"/>
+  <text x="78" y="126" font-size="12" font-weight="700" text-anchor="middle" fill="#2B1F10">Gestor Territorial</text>
+  <text x="78" y="143" font-size="9.5" text-anchor="middle" fill="#5A4634">decide e registra</text>
+
+  <rect x="12" y="174" width="132" height="54" rx="8" fill="#F0E6D8" stroke="#5A4634" stroke-width="1.3"/>
+  <text x="78" y="192" font-size="12" font-weight="700" text-anchor="middle" fill="#2B1F10">Administrador /</text>
+  <text x="78" y="206" font-size="12" font-weight="700" text-anchor="middle" fill="#2B1F10">Curador de Dados</text>
+  <text x="78" y="221" font-size="9.5" text-anchor="middle" fill="#5A4634">configura</text>
+
+  <!-- App -->
+  <rect x="214" y="30" width="250" height="300" rx="12" fill="#E8F4F0" stroke="#0E5C56" stroke-width="2"/>
+  <text x="339" y="52" font-size="12.5" font-weight="700" text-anchor="middle" fill="#00312D">Territory Intelligence</text>
+  <text x="339" y="68" font-size="12.5" font-weight="700" text-anchor="middle" fill="#00312D">Dashboard</text>
+  <text x="339" y="84" font-size="9.5" text-anchor="middle" fill="#0E5C56">app Android · Kotlin · Compose</text>
+
+  <rect x="232" y="98" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="117" font-size="10" text-anchor="middle" fill="#17201D">Painel territorial</text>
+  <rect x="232" y="134" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="153" font-size="10" text-anchor="middle" fill="#17201D">Detalhe do indicador (gráfico)</text>
+  <rect x="232" y="170" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="189" font-size="10" text-anchor="middle" fill="#17201D">Detalhe do alerta + justificativa</text>
+  <rect x="232" y="206" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="225" font-size="10" text-anchor="middle" fill="#17201D">Registro da decisão humana</text>
+  <rect x="232" y="242" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="261" font-size="10" text-anchor="middle" fill="#17201D">Histórico de decisões</text>
+  <rect x="232" y="278" width="214" height="30" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="339" y="297" font-size="10" text-anchor="middle" fill="#17201D">Configurações e fontes</text>
+
+  <!-- Dados -->
+  <text x="534" y="20" font-size="11" font-weight="700" fill="#0E5C56">DADOS E RECURSOS</text>
+  <rect x="534" y="34" width="174" height="60" rx="8" fill="#FFF8E8" stroke="#6B4300" stroke-width="1.3"/>
+  <text x="621" y="53" font-size="10.5" font-weight="700" text-anchor="middle" fill="#6B4300">assets/seed/*.json</text>
+  <text x="621" y="68" font-size="9" text-anchor="middle" fill="#6B4300">base sintética documentada</text>
+  <text x="621" y="82" font-size="9" text-anchor="middle" fill="#6B4300">7.575 leituras · 21 dias</text>
+
+  <rect x="534" y="112" width="174" height="60" rx="8" fill="#E8F0FA" stroke="#0B3C6B" stroke-width="1.3"/>
+  <text x="621" y="131" font-size="10.5" font-weight="700" text-anchor="middle" fill="#0B3C6B">Room (banco local)</text>
+  <text x="621" y="146" font-size="9" text-anchor="middle" fill="#0B3C6B">leituras · decisões</text>
+  <text x="621" y="160" font-size="9" text-anchor="middle" fill="#0B3C6B">offline é o regime normal</text>
+
+  <rect x="534" y="190" width="174" height="60" rx="8" fill="#E8F0FA" stroke="#0B3C6B" stroke-width="1.3"/>
+  <text x="621" y="209" font-size="10.5" font-weight="700" text-anchor="middle" fill="#0B3C6B">SharedPreferences</text>
+  <text x="621" y="224" font-size="9" text-anchor="middle" fill="#0B3C6B">território, temas,</text>
+  <text x="621" y="238" font-size="9" text-anchor="middle" fill="#0B3C6B">modo de simulação</text>
+
+  <rect x="534" y="268" width="174" height="60" rx="8" fill="#FBEEEC" stroke="#8A1B0C" stroke-width="1.3"/>
+  <text x="621" y="287" font-size="10.5" font-weight="700" text-anchor="middle" fill="#8A1B0C">Notificação local</text>
+  <text x="621" y="302" font-size="9" text-anchor="middle" fill="#8A1B0C">recurso nativo do Android</text>
+  <text x="621" y="316" font-size="9" text-anchor="middle" fill="#8A1B0C">permissão + plano B</text>
+
+  <!-- Setas pessoas -> app (o papel de cada pessoa ja esta na propria caixa) -->
+  <line x1="146" y1="61" x2="211" y2="112" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <line x1="146" y1="131" x2="211" y2="186" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <line x1="146" y1="201" x2="211" y2="291" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+
+  <!-- Setas app <-> dados: rotulo curto, centrado no vao -->
+  <line x1="467" y1="78" x2="531" y2="66" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <text x="499" y="60" font-size="7.5" text-anchor="middle" fill="#3F4945">carga</text>
+  <text x="499" y="69" font-size="7.5" text-anchor="middle" fill="#3F4945">inicial</text>
+
+  <line x1="467" y1="136" x2="531" y2="136" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <text x="499" y="131" font-size="7.5" text-anchor="middle" fill="#3F4945">grava</text>
+  <line x1="531" y1="156" x2="467" y2="156" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <text x="499" y="169" font-size="7.5" text-anchor="middle" fill="#3F4945">lê série</text>
+
+  <line x1="467" y1="220" x2="531" y2="220" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <text x="499" y="215" font-size="7.5" text-anchor="middle" fill="#3F4945">prefs</text>
+
+  <line x1="467" y1="298" x2="531" y2="298" stroke="#3F4945" stroke-width="1.3" marker-end="url(#seta)"/>
+  <text x="499" y="286" font-size="7.5" text-anchor="middle" fill="#3F4945">notifica</text>
+  <text x="499" y="295" font-size="7.5" text-anchor="middle" fill="#3F4945">crítico</text>
+
+  <!-- Nota -->
+  <rect x="12" y="352" width="696" height="62" rx="8" fill="#F4F8F6" stroke="#C9D6D1"/>
+  <text x="24" y="372" font-size="10" font-weight="700" fill="#00312D">Sem rede, por projeto.</text>
+  <text x="24" y="388" font-size="9.5" fill="#17201D">O app não declara a permissão de INTERNET: toda leitura vem do aparelho. A base pública real entraria</text>
+  <text x="24" y="403" font-size="9.5" fill="#17201D">como uma nova implementação de TerritoryRepository, sem tocar no domínio nem nas telas.</text>
+</svg>
+<figcaption>Figura 1 — Contexto e fluxo de dados. À esquerda, cada pessoa e o que ela faz no app; à direita, a carga inicial dos arquivos, a leitura e gravação no banco local, as preferências e a notificação do alerta crítico.</figcaption>
+</figure>
+</section>
+
+<section class="quebra">
+<h3>2.5 Diagrama de camadas e módulos</h3>
+<figure>
+<svg viewBox="0 0 720 500" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="dep" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#0E5C56"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="720" height="500" fill="#FFFFFF"/>
+
+  <!-- CAMADA UI -->
+  <rect x="14" y="14" width="692" height="140" rx="10" fill="#E8F4F0" stroke="#0E5C56" stroke-width="2"/>
+  <text x="26" y="34" font-size="12" font-weight="700" fill="#00312D">CAMADA DE INTERFACE — ui/ (Jetpack Compose)</text>
+  <text x="26" y="48" font-size="9" fill="#0E5C56">descreve o estado · não decide regra · não conhece Room</text>
+
+  <rect x="26" y="58" width="152" height="40" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="102" y="74" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">5 Telas</text>
+  <text x="102" y="89" font-size="8" text-anchor="middle" fill="#3F4945">Painel · Indicador · Alerta</text>
+
+  <rect x="186" y="58" width="196" height="40" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="284" y="74" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">7 Composables reutilizáveis</text>
+  <text x="284" y="89" font-size="8" text-anchor="middle" fill="#3F4945">KpiCard · TrendChart · AlertCard…</text>
+
+  <rect x="390" y="58" width="152" height="40" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="466" y="74" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">4 ViewModels</text>
+  <text x="466" y="89" font-size="8" text-anchor="middle" fill="#3F4945">StateFlow&lt;UiState&lt;T&gt;&gt;</text>
+
+  <rect x="550" y="58" width="144" height="40" rx="6" fill="#FFFFFF" stroke="#8FB8B1"/>
+  <text x="622" y="74" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">Tema e navegação</text>
+  <text x="622" y="89" font-size="8" text-anchor="middle" fill="#3F4945">tokens · NavHost</text>
+
+  <rect x="26" y="108" width="668" height="34" rx="6" fill="#F7FAF8" stroke="#C9D6D1"/>
+  <text x="360" y="129" font-size="9" text-anchor="middle" fill="#3F4945">fluxo unidirecional: o evento sobe da tela para o ViewModel · o estado desce do ViewModel para a tela</text>
+
+  <!-- seta UI -> dominio -->
+  <line x1="360" y1="156" x2="360" y2="184" stroke="#0E5C56" stroke-width="2.5" marker-end="url(#dep)"/>
+  <text x="372" y="175" font-size="9" font-weight="700" fill="#0E5C56">depende de (contrato)</text>
+
+  <!-- CAMADA DOMINIO -->
+  <rect x="14" y="188" width="692" height="150" rx="10" fill="#FFF8E8" stroke="#6B4300" stroke-width="2"/>
+  <text x="26" y="208" font-size="12" font-weight="700" fill="#6B4300">CAMADA DE DOMÍNIO — domain/ (Kotlin puro, zero import de Android)</text>
+  <text x="26" y="222" font-size="9" fill="#6B4300">aqui mora a regra · testável na JVM · sobrevive a uma troca de framework</text>
+
+  <rect x="26" y="232" width="158" height="52" rx="6" fill="#FFFFFF" stroke="#D9B98A"/>
+  <text x="105" y="250" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">model/</text>
+  <text x="105" y="264" font-size="8" text-anchor="middle" fill="#3F4945">Territory · Indicator · Reading</text>
+  <text x="105" y="276" font-size="8" text-anchor="middle" fill="#3F4945">Alert · Justification · Decision</text>
+
+  <rect x="192" y="232" width="178" height="52" rx="6" fill="#FFFFFF" stroke="#D9B98A"/>
+  <text x="281" y="250" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">forecast/ForecastEngine</text>
+  <text x="281" y="264" font-size="8" text-anchor="middle" fill="#3F4945">pico diário · média móvel</text>
+  <text x="281" y="276" font-size="8" text-anchor="middle" fill="#3F4945">regressão linear · confiança</text>
+
+  <rect x="378" y="232" width="150" height="52" rx="6" fill="#FFFFFF" stroke="#D9B98A"/>
+  <text x="453" y="250" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">usecase/</text>
+  <text x="453" y="264" font-size="8" text-anchor="middle" fill="#3F4945">GetDashboard · GetDetail</text>
+  <text x="453" y="276" font-size="8" text-anchor="middle" fill="#3F4945">RegisterDecision</text>
+
+  <rect x="536" y="232" width="158" height="52" rx="6" fill="#FFF0D9" stroke="#6B4300" stroke-dasharray="4 3"/>
+  <text x="615" y="250" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">CONTRATOS</text>
+  <text x="615" y="264" font-size="8" text-anchor="middle" fill="#3F4945">TerritoryRepository</text>
+  <text x="615" y="276" font-size="8" text-anchor="middle" fill="#3F4945">AlertNotifier</text>
+
+  <rect x="26" y="294" width="668" height="32" rx="6" fill="#FFFBF2" stroke="#D9B98A"/>
+  <text x="360" y="314" font-size="9" text-anchor="middle" fill="#6B4300">as interfaces são declaradas AQUI e implementadas na camada de dados — a seta de dependência aponta para cima</text>
+
+  <!-- seta dados -> dominio (invertida) -->
+  <line x1="360" y1="396" x2="360" y2="344" stroke="#0E5C56" stroke-width="2.5" marker-end="url(#dep)"/>
+  <text x="372" y="374" font-size="9" font-weight="700" fill="#0E5C56">implementa o contrato</text>
+
+  <!-- CAMADA DADOS -->
+  <rect x="14" y="400" width="692" height="90" rx="10" fill="#E8F0FA" stroke="#0B3C6B" stroke-width="2"/>
+  <text x="26" y="420" font-size="12" font-weight="700" fill="#0B3C6B">CAMADA DE DADOS E NATIVO — data/ (detalhes substituíveis)</text>
+
+  <rect x="26" y="430" width="128" height="48" rx="6" fill="#FFFFFF" stroke="#8FAFD1"/>
+  <text x="90" y="448" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">local/</text>
+  <text x="90" y="461" font-size="8" text-anchor="middle" fill="#3F4945">Room · TidDao</text>
+  <text x="90" y="472" font-size="8" text-anchor="middle" fill="#3F4945">4 entidades</text>
+
+  <rect x="162" y="430" width="128" height="48" rx="6" fill="#FFFFFF" stroke="#8FAFD1"/>
+  <text x="226" y="448" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">seed/</text>
+  <text x="226" y="461" font-size="8" text-anchor="middle" fill="#3F4945">SeedLoader</text>
+  <text x="226" y="472" font-size="8" text-anchor="middle" fill="#3F4945">assets JSON</text>
+
+  <rect x="298" y="430" width="150" height="48" rx="6" fill="#FFFFFF" stroke="#8FAFD1"/>
+  <text x="373" y="448" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">repository/</text>
+  <text x="373" y="461" font-size="8" text-anchor="middle" fill="#3F4945">TerritoryRepositoryImpl</text>
+  <text x="373" y="472" font-size="8" text-anchor="middle" fill="#3F4945">+ modos de degradação</text>
+
+  <rect x="456" y="430" width="118" height="48" rx="6" fill="#FFFFFF" stroke="#8FAFD1"/>
+  <text x="515" y="448" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">prefs/</text>
+  <text x="515" y="461" font-size="8" text-anchor="middle" fill="#3F4945">PreferencesStore</text>
+
+  <rect x="582" y="430" width="112" height="48" rx="6" fill="#FBEEEC" stroke="#8A1B0C"/>
+  <text x="638" y="448" font-size="9.5" font-weight="700" text-anchor="middle" fill="#17201D">platform/</text>
+  <text x="638" y="461" font-size="8" text-anchor="middle" fill="#3F4945">AndroidAlertNotifier</text>
+  <text x="638" y="472" font-size="8" text-anchor="middle" fill="#3F4945">único ponto nativo</text>
+</svg>
+<figcaption>Figura 2 — Camadas e módulos. As duas setas apontam para o domínio: nem a interface nem os
+dados mandam nele.</figcaption>
+</figure>
+
+<h3>2.6 Quadro de apoio — perguntas norteadoras respondidas</h3>
+<table>
+  <tr><th style="width:20%">Pergunta</th><th>Resposta da equipe</th></tr>
+  <tr><td><strong>Responsabilidade</strong></td>
+      <td>Sim. Nenhum <code>Composable</code> calcula alerta nem acessa o banco; nenhum caso de uso
+      formata texto de tela; nenhuma entidade do Room aparece fora de <code>data/</code>.</td></tr>
+  <tr><td><strong>Dependência</strong></td>
+      <td>Não. O pacote <code>domain/</code> não tem um único <code>import android.*</code> — por
+      isso os 16 testes rodam na JVM, sem emulador. Essa é a prova objetiva da separação.</td></tr>
+  <tr><td><strong>Substituição</strong></td>
+      <td>Sim. Trocar a base sintética por uma fonte pública real é escrever outra classe que
+      implemente <code>TerritoryRepository</code> e registrá-la no <code>AppContainer</code> —
+      uma linha. Nem o <code>ForecastEngine</code> nem as telas mudam.</td></tr>
+  <tr><td><strong>Risco: que fronteira falha primeiro?</strong></td>
+      <td>A <strong>permissão de notificação</strong>, porque depende do usuário e do sistema. Por
+      isso ela é a única isolada atrás de um contrato com três resultados declarados
+      (<code>Sent</code>, <code>PermissionDenied</code>, <code>Unavailable</code>). A segunda é a
+      <strong>validade do dado</strong>, tratada com a regra de 24 h.</td></tr>
+  <tr><td><strong>Complexidade adicional</strong></td>
+      <td>Real: ~4.400 linhas em 36 arquivos para 5 telas, e o mapeamento entidade↔domínio é
+      repetitivo. O que compra: regra testável sem emulador e troca de fonte de dados sem
+      refatoração. Para um trio com prazo fechado, o seguro valeu o prêmio.</td></tr>
+</table>
+</section>
+
+<!-- ========================================================== ETAPA 3 -->
+<section class="quebra">
+<h2>Etapa 3 — Estado e Persistência de Dados <span class="selo pontos">2,0 pontos</span></h2>
+<p><em>Pergunta-guia: onde este dado vive quando a tela some?</em></p>
+
+<h3>3.1 Gerenciamento de estado</h3>
+<table>
+  <tr><th style="width:17%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Solução adotada</strong></td>
+      <td><code>ViewModel</code> + <code>StateFlow</code> por tela, lido no Compose com
+      <code>collectAsStateWithLifecycle()</code>. <code>remember</code> / <code>mutableStateOf</code>
+      só para estado que nasce e morre na tela. <strong>Sem Hilt:</strong> a injeção é um
+      <code>AppContainer</code> montado à mão na <code>Application</code> — com um repositório e
+      quatro casos de uso, Hilt cobraria tempo de build e de aprendizado sem resolver problema
+      nenhum. Como tudo depende de interfaces, adotar Hilt depois não quebra nada.</td></tr>
+  <tr><td><strong>Tipos de estado</strong></td>
+      <td><strong>Local</strong> (vive na tela): menu do <code>TerritorySelector</code> aberto
+      (<code>remember</code>); rascunho do formulário de decisão (<code>rememberSaveable</code>,
+      sobrevive à rotação).<br>
+      <strong>Compartilhado</strong> (vive entre telas e entre sessões): território selecionado,
+      temas monitorados e modo de simulação — em <code>SharedPreferences</code>, com dono único
+      (<code>PreferencesStore</code>), alcançados só pelo repositório.<br>
+      <strong>De dados</strong> (vem do banco, tem validade): leituras, KPIs, alertas e
+      decisões.<br>
+      <em>Estado global é dívida:</em> não existe singleton mutável no app; cada item acima tem um
+      dono declarado.</td></tr>
+  <tr><td><strong>Estados de tela</strong></td>
+      <td><code>sealed interface UiState&lt;out T&gt;</code> com <code>Loading</code>,
+      <code>Empty(message)</code>, <code>Error(message)</code> e
+      <code>Success(data, staleWarning)</code>. O componente <code>StateView</code> traduz cada um
+      numa tela de verdade, em <strong>todas</strong> as telas: nunca há tela branca, nem erro sem
+      saída. O aviso de dado vencido viaja dentro do próprio <code>Success</code>, porque o app
+      continua útil com dado velho — só não alerta.</td></tr>
+  <tr><td><strong>Fluxo de dados</strong></td>
+      <td>Toque no <code>Composable</code> → callback → método do <code>ViewModel</code> → caso de
+      uso → repositório → Room → o caso de uso devolve o modelo de domínio → o ViewModel publica
+      em <code>StateFlow</code> → o Compose recompõe. <strong>O estado desce, os eventos
+      sobem</strong>; nenhum componente altera estado que não seja dele.</td></tr>
+  <tr><td><strong>Ciclo de vida</strong></td>
+      <td><strong>Rotação:</strong> o estado vive no ViewModel e sobrevive; o rascunho do
+      formulário usa <code>rememberSaveable</code>.<br>
+      <strong>Botão Voltar:</strong> a rota carrega só identificadores, nunca o objeto — ao
+      voltar, a tela relê do repositório e nunca mostra dado obsoleto.<br>
+      <strong>Morte do processo:</strong> território, temas e modo de simulação estão em
+      <code>SharedPreferences</code>; as leituras e as decisões estão no Room. Nada essencial
+      vive só em memória.<br>
+      <strong>Carregamento duplicado:</strong> o painel recarrega no <code>ON_RESUME</code>
+      (<code>LifecycleResumeEffect</code>) e uma nova carga <em>cancela</em> a anterior
+      (<code>loadJob?.cancel()</code>); as telas de detalhe guardam a última chave carregada e
+      ignoram pedidos repetidos.</td></tr>
+  <tr><td><strong>Estado derivado</strong></td>
+      <td>KPIs, alertas e a série do gráfico <strong>não são persistidos</strong>: são calculados
+      a partir das leituras a cada carga. Não há duas versões da verdade. Dentro do painel, os
+      picos diários são calculados <strong>uma vez por indicador</strong> e reaproveitados pelo
+      motor de previsão e pelo KPI.</td></tr>
+</table>
+
+<h3>3.2 Fontes de dados</h3>
+<table>
+  <tr><th style="width:17%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Origem e licença</strong></td>
+      <td>Fonte única: <strong>base sintética</strong> gerada por
+      <code>tools/gerar_dados_sinteticos.py</code>, em três arquivos JSON em
+      <code>app/src/main/assets/seed/</code> (<code>territories.json</code> 312 B,
+      <code>indicators.json</code> 998 B, <code>readings.json</code> 46 KB).
+      <strong>Licença: uso acadêmico livre (GS2026.2).</strong> Os valores foram calibrados para
+      ficar na mesma ordem de grandeza de publicações abertas (ONS — curva de carga; SNIS —
+      saneamento; INMET — clima), mas <strong>não reproduzem nenhuma série real</strong> e nenhum
+      dado dessas fontes foi copiado.</td></tr>
+  <tr><td><strong>Carga dos dados</strong></td>
+      <td><code>SeedLoader</code> lê os arquivos de <code>assets/</code> e popula o Room na
+      primeira execução, em <strong>uma única transação</strong> (<code>TidDao.seedAll</code>): ou
+      a base entra inteira, ou não entra. A operação é <strong>idempotente</strong> — se já houver
+      território, nada acontece. Daí em diante o repositório entrega os dados ao domínio pelo
+      contrato <code>TerritoryRepository</code>, que não menciona Room nem assets.</td></tr>
+  <tr><td><strong>Dados sintéticos</strong></td>
+      <td>Gerados com semente fixa (<code>SEED = 2026</code>): rodar o script de novo produz
+      exatamente a mesma base. O modelo é <em>base × tendência semanal × ciclo diário × fator de
+      fim de semana × ruído gaussiano</em>, com perfil declarado por (indicador, território).
+      <strong>Na tela, todo dado é identificado como fictício:</strong> a faixa do painel, cada
+      <code>KpiCard</code>, cada <code>AlertCard</code> e a justificativa trazem
+      “Dado sintético”, e a tela Configurações traz a origem e a licença por extenso.</td></tr>
+  <tr><td><strong>Atualização e validade</strong></td>
+      <td>A base é recarregada a cada nova versão do app (nova carga dos assets). O instante de
+      cada leitura é calculado <em>no momento da carga</em> a partir do campo
+      <code>startHoursAgo</code>, então a base nunca nasce velha. O app exibe sempre a data e o
+      tempo relativo da última leitura (“há 4 min”) e, passadas <strong>24 h</strong>, mostra a
+      faixa de dado desatualizado e <strong>suspende os alertas</strong>.</td></tr>
+  <tr><td><strong>Privacidade</strong></td>
+      <td>Nenhum dado pessoal real, em nenhum ponto. Os dados territoriais são agregados por
+      bairro/área. O único dado digitado por uma pessoa é o <em>nome do responsável</em> pela
+      decisão, que fica apenas no aparelho e pode ser apagado pelo próprio usuário.</td></tr>
+</table>
+</section>
+
+<section>
+<h3>3.3 Persistência de dados</h3>
+<table>
+  <tr><th style="width:17%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Tecnologia escolhida</strong></td>
+      <td><strong>Room 2.8.5 sobre SQLite</strong> para a série temporal e as decisões: são
+      milhares de linhas que precisam de consulta por território, indicador e faixa de tempo —
+      exatamente o que um índice resolve e um arquivo não.
+      <strong>SharedPreferences</strong> para as quatro preferências simples. Avaliamos DataStore;
+      ele seria a escolha certa se houvesse concorrência ou dados estruturados, mas aqui
+      adicionaria uma dependência para guardar quatro chaves. A troca é local ao
+      <code>PreferencesStore</code>.</td></tr>
+  <tr><td><strong>O que é persistido</strong></td>
+      <td>Leituras (série temporal, 7.575 linhas), territórios, indicadores com seus limiares, e o
+      histórico de decisões humanas. <strong>Não</strong> são persistidos KPIs nem alertas: são
+      estado derivado.</td></tr>
+  <tr><td><strong>Offline é regime normal</strong></td>
+      <td>O app <strong>não declara a permissão de INTERNET</strong>. Toda consulta vem do banco
+      local. A política de atualização é: carga na instalação, validade de 24 h, aviso explícito
+      ao usuário quando vencida e suspensão dos alertas preditivos nesse período.</td></tr>
+  <tr><td><strong>Repositório</strong></td>
+      <td><code>TerritoryRepositoryImpl</code> isola Room, assets e preferências. O domínio só
+      conhece a interface. É também onde mora o <code>DataFailureMode</code>, que permite
+      demonstrar a degradação sem mexer no código.</td></tr>
+  <tr><td><strong>Privacidade (LGPD)</strong></td>
+      <td><strong>Quais dados:</strong> leituras sintéticas, território escolhido, temas
+      monitorados e o histórico de decisões (nome do responsável, ação, observação, data).<br>
+      <strong>Por quanto tempo:</strong> enquanto o app estiver instalado.
+      <strong>Quem coleta e guarda:</strong> o próprio aparelho — não há servidor nem envio.<br>
+      <strong>Como remover:</strong> botão “Apagar o histórico de decisões” em Configurações e no
+      Histórico; desinstalar remove tudo (<code>allowBackup=false</code>, sem cópia em nuvem).</td></tr>
+</table>
+
+<h3>3.4 Modelo de dados</h3>
+<table class="tab-compacta">
+  <tr><th style="width:16%">Entidade</th><th>Atributos</th><th style="width:26%">Observações</th></tr>
+  <tr><td><strong>Território</strong><br><code>territories</code></td>
+      <td><code>id</code> (PK), <code>name</code>, <code>type</code> (CIDADE / BAIRRO /
+      AREA_RURAL), <code>latitude</code>, <code>longitude</code></td>
+      <td>Enum gravado como texto para não exigir migração ao surgir um novo tipo.</td></tr>
+  <tr><td><strong>Indicador</strong><br><code>indicators</code></td>
+      <td><code>id</code> (PK), <code>theme</code>, <code>name</code>, <code>unit</code>,
+      <code>attentionThreshold</code>, <code>criticalThreshold</code>, <code>description</code></td>
+      <td>Os limiares de referência vivem no dado, não no código: mudar um limiar é mudar a base.</td></tr>
+  <tr><td><strong>Leitura</strong><br><code>readings</code></td>
+      <td><code>id</code> (PK auto), <code>indicatorId</code>, <code>territoryId</code>,
+      <code>timestamp</code>, <code>value</code>, <code>origin</code> (PUBLICA / SINTETICA /
+      AUTORIZADA)</td>
+      <td>Índice composto <code>(territoryId, indicatorId, timestamp)</code>. A origem acompanha
+      <em>cada leitura</em>, então uma base mista ficaria identificada linha a linha.</td></tr>
+  <tr><td><strong>Alerta</strong><br><em>não persistido</em></td>
+      <td><code>id</code>, tipo, <code>level</code>, <code>confidence</code>,
+      <code>justification</code>, janela prevista, valor projetado, recomendação,
+      <code>requiresHumanConfirmation</code></td>
+      <td>Estado derivado: recalculado a partir das leituras. Persistir criaria duas verdades —
+      um alerta salvo poderia contradizer o dado atual.</td></tr>
+  <tr><td><strong>Decisão</strong><br><code>decisions</code></td>
+      <td><code>id</code> (PK auto), <code>alertId</code>, <code>alertTitle</code>,
+      <code>territoryName</code>, <code>responsible</code>, <code>action</code> (ACATAR / ADIAR /
+      DESCARTAR), <code>note</code>, <code>createdAt</code></td>
+      <td>Guarda o <em>título do alerta no momento da decisão</em>, e não só o id: o histórico
+      precisa continuar legível mesmo que o alerta mude depois.</td></tr>
+</table>
+
+<h3>3.5 Recursos nativos e permissões</h3>
+<p>Todo recurso externo tem três estados — disponível, negado e instável — e os três estão
+modelados em <code>NotifyResult</code>. A tela <strong>nunca</strong> chama a API do Android
+diretamente: ela conhece só a interface <code>AlertNotifier</code>, declarada no domínio.</p>
+<table>
+  <tr><th style="width:20%">Recurso</th><th style="width:28%">Risco</th><th>Plano B implementado</th></tr>
+  <tr><td><strong>Notificação local de alerta crítico</strong></td>
+      <td>Android 13+ exige <code>POST_NOTIFICATIONS</code> em tempo de execução; o usuário pode
+      negar ou negar para sempre.</td>
+      <td>A permissão é pedida <strong>no toque que precisa dela</strong> (botão de sino e botão
+      “Notificar a equipe”), não na abertura do app. Se negada, uma mensagem explica que o alerta
+      <em>continua visível no painel</em> e Configurações mostra um aviso com atalho para as
+      configurações do sistema. Nenhum alerta se perde.</td></tr>
+  <tr><td><strong>Canal de notificação</strong></td>
+      <td>Usuário pode desligar o canal no sistema, mesmo com a permissão concedida.</td>
+      <td><code>areNotificationsEnabled()</code> é verificado antes de notificar; o resultado
+      <code>Unavailable(reason)</code> informa o motivo na tela.</td></tr>
+  <tr><td><strong>Armazenamento local</strong></td>
+      <td>Gravação parcial, espaço insuficiente, processo morto no meio da carga.</td>
+      <td>A carga inicial inteira em <strong>uma transação</strong>; leitura protegida por
+      <code>runCatching</code>, com <code>UiState.Error</code> e botão “Tentar novamente”.</td></tr>
+</table>
+<p><strong>Regra prática adotada:</strong> pedir a permissão no toque que precisa dela, com o
+motivo visível na tela, e tratar os três caminhos — concedida, negada e negada para sempre.
+Para a defesa, o roteiro de demonstração nega a permissão de propósito.</p>
+</section>
+
+<!-- ========================================================== ETAPA 4 -->
+<section class="quebra">
+<h2>Etapa 4 — Identidade Visual e Componentes Reutilizáveis <span class="selo pontos">1,0 ponto</span></h2>
+
+<h3>4.1 Identidade visual (design tokens)</h3>
+<table>
+  <tr><th style="width:17%">Elemento</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Conceito e marca</strong></td>
+      <td>Nome: <strong>Territory Intelligence</strong>. Conceito: <em>“território vivo”</em>. O
+      ícone traz barras de indicador subindo com o marcador de localização acima — dado que vira
+      lugar. O verde-petróleo remete a ambiente e saneamento; a cor terra, ao território.</td></tr>
+  <tr><td><strong>Tema único</strong></td>
+      <td>Uma só fonte de verdade visual: <code>ui/theme/Theme.kt</code>, com
+      <code>ColorScheme</code>, <code>Typography</code>, <code>Shapes</code> e dois tokens
+      próprios do app (<code>StatusColors</code> e <code>Spacing</code>) entregues por
+      <code>CompositionLocal</code>. <strong>Valor solto no código é falha de tema:</strong>
+      nenhuma tela declara cor; espaçamento e raio vêm sempre dos tokens.</td></tr>
+  <tr><td><strong>Paleta de cores</strong></td>
+      <td>Primária petróleo <code>#0E5C56</code>, secundária terra <code>#5A4634</code>, e quatro
+      cores semânticas — normal, informativo, atenção e crítico — cada uma com par de
+      fundo/conteúdo e <strong>definição própria para o modo escuro</strong>. Os 17 pares foram
+      medidos pela fórmula de contraste da WCAG: <strong>o pior caso é 5,48:1</strong>, acima do
+      mínimo de 4,5:1 (tabela em 7.3, Prova 4).</td></tr>
+  <tr><td><strong>Tipografia e espaçamento</strong></td>
+      <td>Escala enxuta de <strong>6 níveis</strong> (headlineMedium, titleLarge, titleMedium,
+      bodyLarge, bodyMedium, labelLarge), toda em <code>sp</code> para crescer com a fonte do
+      sistema. Grade de espaçamento em múltiplos de 4 dp (4/8/16/24/32) e raios padronizados
+      (6/10/16/22/28 dp).</td></tr>
+  <tr><td><strong>Iconografia e gráficos</strong></td>
+      <td>Ícones do conjunto Material (Warning, Info, CheckCircle, Place, Notifications, List,
+      Settings, Delete). O <code>TrendChart</code> tem estilo próprio: histórico em linha cheia na
+      cor primária, projeção em <strong>tracejado roxo</strong>, limiar crítico em tracejado
+      vermelho e limiar de atenção em cinza — cada um repetido na legenda <strong>em texto, com o
+      valor</strong>.</td></tr>
+  <tr><td><strong>Acessibilidade</strong></td>
+      <td><strong>Alvo de toque de 48 dp</strong> aplicado por token
+      (<code>Spacing.touchTarget</code>) em cartões, botões, itens de menu e opções.<br>
+      <strong>TalkBack:</strong> cada <code>KpiCard</code> e <code>AlertCard</code> expõe uma
+      única descrição completa (<code>clearAndSetSemantics</code>) em vez de ler pedaço por
+      pedaço; o <code>TrendChart</code>, que é um Canvas e seria invisível ao leitor de tela,
+      expõe um resumo textual com os valores-chave.<br>
+      <strong>Fonte a 200%:</strong> verificado — o texto reflui e nada é cortado (evidência
+      fotográfica em 7.3).<br>
+      <strong>A cor nunca comunica sozinha:</strong> todo nível de alerta aparece como
+      <em>cor + ícone + rótulo escrito</em> (“Crítico”, “Atenção”, “Informativo”, “Dentro do
+      normal”).</td></tr>
+  <tr><td><strong>Layout adaptativo</strong></td>
+      <td>Nenhuma medida fixa em pixels: tudo em <code>dp</code>/<code>sp</code> com
+      <code>fillMaxWidth</code> e <code>weight</code>. Os cartões crescem em altura em vez de
+      cortar texto; os títulos usam <code>maxLines</code> com reticências onde faz sentido. O
+      ponto de quebra é dado pelo conteúdo que precisa caber — o painel é uma lista de uma coluna
+      que funciona de 4" a tablet, e a rotação é tratada sem recriar a Activity.</td></tr>
+</table>
+</section>
+
+<section>
+<h3>4.2 Componentes reutilizáveis — 7 entregues</h3>
+<p>Todos recebem dados por parâmetro e devolvem eventos por callback (elevação de estado).
+<strong>Nenhum tem regra de negócio dentro:</strong> o componente descreve, não decide.</p>
+<table class="tab-compacta">
+  <tr><th style="width:17%">Composable</th><th>Responsabilidade</th><th style="width:24%">Parâmetros e callbacks</th><th style="width:17%">Usado em</th></tr>
+  <tr><td><strong>KpiCard</strong></td>
+      <td>Indicador com valor, unidade, variação semanal, status e data da leitura.</td>
+      <td><code>title, currentValue, unit, variationPercent, level, lastReadingAt, originLabel, onClick</code></td>
+      <td>Painel, Detalhe do Indicador</td></tr>
+  <tr><td><strong>TrendChart</strong></td>
+      <td>Série temporal em Canvas com faixa de projeção e linhas de limiar, mais legenda textual.</td>
+      <td><code>points, unit, attentionThreshold, criticalThreshold</code></td>
+      <td>Detalhe do Indicador, Detalhe do Alerta</td></tr>
+  <tr><td><strong>AlertCard</strong></td>
+      <td>Alerta com nível (ícone + rótulo + cor), resumo, barra de confiança e aviso de alto
+      impacto.</td>
+      <td><code>alert, onClick, showConfidence</code></td>
+      <td>Painel, Detalhe do Indicador, Detalhe do Alerta</td></tr>
+  <tr><td><strong>JustificationPanel</strong></td>
+      <td>Os dados, a regra, o período, a confiança, a fonte e a data que originaram o alerta.</td>
+      <td><code>justification, confidenceLabel</code></td>
+      <td>Detalhe do Alerta, Detalhe do Indicador</td></tr>
+  <tr><td><strong>TerritorySelector</strong></td>
+      <td>Seleção de cidade, bairro ou área rural; o “menu aberto” é estado local do componente.</td>
+      <td><code>territories, selected, onSelect</code></td>
+      <td>Painel, Configurações</td></tr>
+  <tr><td><strong>StateView</strong></td>
+      <td>Padroniza carregando, vazio e erro (com “Tentar novamente”). Acompanham-no
+      <code>WarningBanner</code> e <code>InfoBanner</code>.</td>
+      <td><code>state, onRetry, content</code></td>
+      <td>Todas as 5 telas</td></tr>
+  <tr><td><strong>DecisionSheet</strong></td>
+      <td>Registro da decisão humana: ação, responsável e observação, com o rascunho preservado na
+      rotação.</td>
+      <td><code>alert, defaultResponsible, errorMessage, onDismiss, onConfirm</code></td>
+      <td>Detalhe do Alerta</td></tr>
+</table>
+
+<h3>4.3 Telas mínimas e navegação</h3>
+<table>
+  <tr><th style="width:22%">Tela</th><th>Conteúdo</th></tr>
+  <tr><td><strong>1. Painel</strong></td>
+      <td>Seletor de território, faixa de origem e data da última atualização, alertas ativos
+      ordenados por gravidade, lista de indicadores e a seção <em>“Por que estes indicadores não
+      geraram alerta”</em>.</td></tr>
+  <tr><td><strong>2. Detalhe do Indicador</strong></td>
+      <td>KPI, gráfico com histórico/limiares/projeção, número de leituras locais, fonte dos
+      dados e o alerta com a justificativa (ou o motivo de não haver alerta).</td></tr>
+  <tr><td><strong>3. Detalhe do Alerta</strong></td>
+      <td>Alerta, justificativa completa, gráfico, recomendação, aviso de humano no circuito,
+      registro da decisão e notificação local.</td></tr>
+  <tr><td><strong>4. Histórico de Decisões</strong></td>
+      <td>Lista com ação, alerta, território, responsável, observação e data; aviso de LGPD e
+      botão de exclusão.</td></tr>
+  <tr><td><strong>5. Configurações</strong></td>
+      <td>Território, temas monitorados, limiares de referência, estado da permissão de
+      notificação, origem e licença dos dados, privacidade/LGPD e os cenários de simulação de
+      falha.</td></tr>
+  <tr><td><strong>Navegação</strong></td>
+      <td>Navigation Compose com 5 rotas. <strong>A rota carrega apenas identificadores</strong>
+      (<code>indicator/{territoryId}/{indicatorId}</code>), nunca o objeto inteiro: quem precisa
+      do dado relê do repositório. Ao voltar, o painel recarrega no <code>ON_RESUME</code>, então
+      uma mudança feita em Configurações aparece imediatamente — e nada obsoleto sobrevive ao
+      botão Voltar.</td></tr>
+</table>
+</section>
+
+<!-- ========================================================== ETAPA 5 -->
+<section class="quebra">
+<h2>Etapa 5 — Alertas Preditivos e Decisão Humana <span class="selo pontos">1,0 ponto</span></h2>
+
+<h3>5.1 Como o app antecipa o problema</h3>
+<table>
+  <tr><th style="width:17%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Método de previsão</strong></td>
+      <td>Combinação de três passos explicáveis, todos em Kotlin puro no
+      <code>ForecastEngine</code>:<br>
+      <strong>1. Pico diário.</strong> As leituras horárias são agregadas no <em>maior valor de
+      cada dia</em>. Motivo: o risco territorial acontece no pico (18h–19h na energia, meio da
+      tarde no calor), não na média — uma média diária esconderia exatamente o momento perigoso.<br>
+      <strong>2. Média móvel de 7 dias e variação semanal</strong> (últimos 7 dias contra os 7
+      anteriores), para separar tendência de oscilação do dia.<br>
+      <strong>3. Regressão linear por mínimos quadrados</strong> sobre os picos de 14 dias,
+      projetando o valor para <strong>+2 dias (48 h)</strong>, com o R² guardado como medida de
+      aderência.<br>
+      <em>Por que não um modelo de IA:</em> a exigência do projeto é que o gestor entenda e
+      conteste o alerta. Uma reta de tendência com R² declarado pode ser conferida à mão com os
+      números que a própria tela mostra; uma rede neural, não. Sofisticação que não se explica,
+      aqui, é defeito.</td></tr>
+  <tr><td><strong>Níveis de alerta</strong></td>
+      <td><strong>Crítico</strong> — projeção ≥ limiar crítico.<br>
+      <strong>Atenção</strong> — projeção ≥ limiar de atenção.<br>
+      <strong>Informativo</strong> — projeção ≥ 90% do limiar de atenção (antecipa a antecipação).<br>
+      Abaixo disso, <strong>nenhum alerta</strong> — e o app diz por quê.</td></tr>
+  <tr><td><strong>Justificativa</strong></td>
+      <td>O tipo <code>Alert</code> só existe com <code>justification</code> preenchida: é
+      impossível, no modelo de domínio, criar alerta sem justificativa. O painel exibe
+      <strong>8 variáveis com valor</strong> (pico mais recente, média móvel de 7 dias, variação
+      semanal, tendência em unidade/dia, projeção em 2 dias, limiar de atenção, limiar crítico e
+      R²), mais a regra aplicada em texto, o período analisado, a fonte e a data da última
+      atualização.</td></tr>
+  <tr><td><strong>Confiança e limites</strong></td>
+      <td>Confiança = <code>0,40 + 0,50 × R²</code>, com desconto de 0,10 se houver menos de 10
+      dias de histórico, limitada entre 30% e 92%. <strong>O app nunca declara certeza.</strong><br>
+      <strong>Os quatro casos em que ele se cala</strong>, sempre informando o motivo na tela:
+      (a) menos de 8 dias de histórico; (b) leitura mais recente com mais de 24 h; (c) tendência
+      não identificável (R² &lt; 0,20) e projeção abaixo do limiar crítico — preferimos o silêncio
+      ao falso positivo; (d) projeção abaixo de 90% do limiar de atenção.</td></tr>
+  <tr><td><strong>Decisão humana</strong></td>
+      <td>O app <strong>só recomenda</strong>: “acompanhar”, “reforçar o monitoramento e avisar a
+      equipe” ou, no nível crítico, “avaliar ação de contenção com a equipe”. Medidas de alto
+      impacto — racionamento, interrupção de serviço, evacuação — são explicitamente apontadas
+      como <strong>não executáveis pelo app</strong>. A pessoa escolhe acatar, adiar ou
+      descartar, informa o responsável e a observação, e o registro vai para o Room com data.
+      Alerta crítico <strong>exige observação escrita</strong> — o caso de uso recusa o registro
+      sem ela.</td></tr>
+  <tr><td><strong>Riscos e ética</strong></td>
+      <td><strong>Falso positivo:</strong> mitigado pelo corte de aderência (R² &lt; 0,20) e pelo
+      nível informativo, que avisa sem assustar.<br>
+      <strong>Falso negativo:</strong> assumido — a regra é linear e não captura evento abrupto
+      (rompimento, apagão). Declarado como limitação e como próximo passo (sazonalidade semanal).<br>
+      <strong>Viés:</strong> os limiares vêm do dado, não do código; um limiar mal calibrado gera
+      alerta desigual entre territórios. Por isso eles são visíveis em Configurações — ficam
+      auditáveis.<br>
+      <strong>Privacidade:</strong> dados agregados e sintéticos, nada pessoal, nada sai do
+      aparelho (LGPD).<br>
+      <strong>Identificação do dado fictício:</strong> “Dado sintético” aparece no painel, em cada
+      cartão, na justificativa, na notificação e em Configurações. Ninguém pode confundir a base
+      de demonstração com dado real.</td></tr>
+</table>
+
+<h3>5.2 Exemplo real produzido pelo app</h3>
+<div class="caixa alerta">
+  <span class="titulo">Atenção: risco de sobrecarga de energia em Jardim das Flores nas próximas 48 h</span>
+  <p><strong>Justificativa (como aparece na tela):</strong> pico mais recente 1.049,4 kWh/h;
+  média móvel de 7 dias 981,8 kWh/h; variação semanal +11,5%; tendência +13,5 kWh/h por dia;
+  projeção em 2 dias 1.045,7 kWh/h; limiar de atenção 900,0 kWh/h; limiar crítico 1.150,0 kWh/h;
+  aderência do ajuste (R²) 0,63.</p>
+  <p><strong>Regra aplicada:</strong> “Pico diário agregado, média móvel de 7 dias e regressão
+  linear sobre 14 dias; a projeção para 48 h (1.045,7 kWh/h) alcança 116% do limiar de atenção.”</p>
+  <p><strong>Confiança e fonte:</strong> 72%. Dado sintético — base documentada em
+  <code>tools/gerar_dados_sinteticos.py</code>. Atualizado há 4 minutos.</p>
+  <p><strong>Ação humana:</strong> o app sugere reforçar o monitoramento e avisar a equipe
+  responsável. O gestor escolhe <em>Acatar</em>, <em>Adiar</em> ou <em>Descartar</em> e registra
+  uma observação. Nada é executado automaticamente.</p>
+</div>
+<p>O mesmo território gera simultaneamente um alerta <strong>crítico</strong> de clima (projeção
+41,4 °C contra limiar crítico de 38 °C, confiança 71%) e um <strong>informativo</strong> de
+resíduos, enquanto água e serviços <strong>não</strong> geram alerta — e o painel explica o motivo
+de cada silêncio. Essa combinação é a demonstração dos quatro estados do motor em uma única tela.</p>
+</section>
+
+<!-- ========================================================== ETAPA 6 -->
+<section class="quebra">
+<h2>Etapa 6 — Decisões Arquiteturais (ADR) <span class="selo pontos">0,5 ponto</span></h2>
+
+<h3>ADR-001 — Android nativo com Kotlin e Compose em vez de Flutter ou React Native</h3>
+<table>
+  <tr><th style="width:17%">Status / Data</th>
+      <td>☐ Proposta &nbsp;&nbsp; <strong>☒ Aceita</strong> &nbsp;&nbsp; ☐ Substituída
+      &nbsp;&nbsp;|&nbsp;&nbsp; Data: <strong>10 / 11 / 2026</strong></td></tr>
+  <tr><th>Contexto</th>
+      <td>Precisamos entregar, em um semestre e com um trio, um app que (a) funcione
+      <strong>offline</strong> lendo uma base local de milhares de leituras, (b) use um
+      <strong>recurso nativo</strong> com permissão em tempo de execução e três caminhos tratados,
+      e (c) seja <strong>defendido tecnicamente</strong> linha a linha por quem o escreveu. O
+      público-alvo usa Android simples em campo; <strong>iOS está fora do escopo declarado</strong>.
+      A disciplina trabalhou Kotlin e Compose no semestre.</td></tr>
+  <tr><th>Decisão</th>
+      <td>Decidimos adotar <strong>Android nativo com Kotlin e Jetpack Compose</strong>, com a
+      regra de negócio isolada em um módulo de domínio em Kotlin puro, atrás de contratos
+      (<code>TerritoryRepository</code>, <code>AlertNotifier</code>).</td></tr>
+  <tr><th>Alternativas consideradas</th>
+      <td><strong>Flutter</strong> — entregaria iOS “de graça”, mas iOS não está no escopo, então
+      o benefício principal não se realiza. Em troca, traria uma linguagem a mais (Dart), um
+      canal de plataforma para a notificação e a necessidade de a banca aceitar explicação sobre
+      código de <em>bridge</em>. <em>Critério de descarte: o ganho não se aplica ao nosso escopo,
+      e o custo de aprendizado comeria o prazo.</em><br>
+      <strong>React Native</strong> — a equipe tem base em JavaScript, mas o app é mais sobre
+      <em>cálculo sobre série temporal e persistência local</em> do que sobre tela; levaríamos
+      ponte nativa para notificação e para o banco, no ponto exatamente mais crítico.
+      <em>Critério de descarte: risco concentrado na fronteira nativa.</em><br>
+      <strong>Nativo separado para cada sistema (Kotlin + Swift)</strong> — dobraria o trabalho
+      para atender um público que não vamos atender.
+      <em>Critério de descarte: custo sem retorno no escopo.</em></td></tr>
+  <tr><th>Consequências positivas</th>
+      <td>Acesso direto ao <code>NotificationManager</code> e ao fluxo de permissão do Android 13+,
+      sem camada intermediária. Room com suporte de primeira classe. Compose é o que a equipe
+      domina, então o tempo foi para a <em>regra</em>, não para a ferramenta. Testes do domínio
+      rodam na JVM em segundos. E, por o domínio ser Kotlin puro atrás de contratos,
+      <strong>uma migração futura para Compose Multiplatform ou Flutter reescreveria apenas a
+      pasta <code>ui/</code></strong> — o <code>ForecastEngine</code> e os casos de uso
+      sobreviveriam.</td></tr>
+  <tr><th>Consequências negativas</th>
+      <td><strong>Assumimos que não há app para iOS.</strong> Se o cliente pedir iOS depois, será
+      uma nova camada de interface — semanas de trabalho, não dias. Ficamos presos ao ciclo de
+      lançamentos do Android (AGP, Compose, Room) e a equipe não ganha experiência em
+      cross-platform. Aceitamos esses custos conscientemente porque o escopo declarado é Android e
+      o prazo é o recurso mais escasso do projeto.</td></tr>
+</table>
+
+<h3>6.1 Da decisão à justificativa</h3>
+<table class="tab-compacta">
+  <tr><th style="width:14%">Decisão</th><th style="width:17%">Alternativa descartada</th><th style="width:15%">Critério</th><th>Preenchimento da equipe</th></tr>
+  <tr><td>Plataforma do app</td><td>Flutter, React Native, nativo duplo</td>
+      <td>Prazo, equipe e experiência no Android</td>
+      <td>Android nativo (ADR-001). iOS fora do escopo, recurso nativo no caminho crítico,
+      equipe já produtiva em Compose. Custo: nenhum app para iOS.</td></tr>
+  <tr><td>Gestão de estado</td><td>Estado local nas telas (<code>remember</code> apenas)</td>
+      <td>Complexidade real do fluxo</td>
+      <td>ViewModel + StateFlow. O painel tem 5 estados possíveis e precisa sobreviver à rotação e
+      refletir mudanças feitas em Configurações; estado só na tela perderia tudo isso. Custo: mais
+      arquivos.</td></tr>
+  <tr><td>Origem dos dados</td><td>Consumo de API remota</td>
+      <td>Escopo da disciplina e uso offline</td>
+      <td>Base sintética documentada em <code>assets/</code> + Room. O usuário-alvo trabalha sem
+      internet, e uma API indisponível na defesa derrubaria a demonstração. Custo: os dados não
+      são reais — declarado em todas as telas.</td></tr>
+  <tr><td>Injeção de dependência</td><td>Hilt</td>
+      <td>Tamanho real do grafo</td>
+      <td><code>AppContainer</code> manual. Um repositório e quatro casos de uso não justificam
+      processamento de anotações. Custo: não escala para dezenas de dependências — mas a troca é
+      local, porque tudo depende de interfaces.</td></tr>
+  <tr><td>Acesso a recursos nativos</td><td>Chamar a API do Android direto na tela</td>
+      <td>Testabilidade e risco de manutenção</td>
+      <td>Contrato <code>AlertNotifier</code> com três resultados declarados. A tela nunca toca no
+      <code>NotificationManager</code>, então o plano B é testável e o recurso é substituível.</td></tr>
+  <tr><td>Entrega do build</td><td>Build manual pela IDE</td>
+      <td>Repetibilidade</td>
+      <td><code>gradlew assembleRelease</code> com o Gradle Wrapper fixado em 8.14.3 e todas as
+      versões travadas. Qualquer integrante gera o mesmo APK com um comando. O release é assinado
+      com a chave de debug para ser instalável na avaliação — e isso está declarado, não
+      escondido.</td></tr>
+</table>
+</section>
+
+<!-- ========================================================== ETAPA 7 -->
+<section class="quebra">
+<h2>Etapa 7 — Qualidade e Entrega do App <span class="selo pontos">1,5 ponto</span></h2>
+
+<h3>7.1 Definition of Done</h3>
+<table class="tab-compacta">
+  <tr><th style="width:38%">Critério mínimo</th><th style="width:9%">Cumprido</th><th>Evidência / observação</th></tr>
+  <tr><td>Requisito implementado e critérios de aceite validados</td><td class="ok">☒</td>
+      <td>RF01–RF08 rastreados até o arquivo que os implementa (tabela 1.8).</td></tr>
+  <tr><td>Fluxo principal validado de ponta a ponta no aparelho ou emulador</td><td class="ok">☒</td>
+      <td>Roteiro completo executado no emulador Pixel API 36 com o <strong>APK release</strong>:
+      painel → alerta → justificativa → decisão → histórico. 21 capturas em
+      <code>docs/evidencias/</code>.</td></tr>
+  <tr><td>Todo alerta exibido com justificativa, confiança e fonte</td><td class="ok">☒</td>
+      <td>Garantido pelo modelo de domínio: <code>Alert</code> não compila sem
+      <code>justification</code>. Verificado na tela (fig. 4).</td></tr>
+  <tr><td>App degrada com clareza com dados ausentes e com permissão negada</td><td class="ok">☒</td>
+      <td>Quatro cenários demonstráveis em Configurações; capturas 8, 12, 13 e 14.</td></tr>
+  <tr><td>Build instalável gerado (APK) com minSdk e targetSdk declarados</td><td class="ok">☒</td>
+      <td><code>app-release.apk</code>, 7.827.015 bytes (7,46 MB), <code>minSdk 24</code>,
+      <code>targetSdk 36</code>, instalado e executado no emulador.</td></tr>
+  <tr><td>Código revisado por outro integrante da equipe</td><td class="ok">☒</td>
+      <td>Revisão cruzada por camada: domínio (Henrique), dados e persistência (Tomazzo),
+      interface e acessibilidade (João Henrique). Cada um revisou a camada que não escreveu.</td></tr>
+  <tr><td>Decisão arquitetural registrada em ADR</td><td class="ok">☒</td>
+      <td>ADR-001 + quadro “Da decisão à justificativa” com 6 decisões (Etapa 6).</td></tr>
+  <tr><td>Uso de IA registrado (prompt, alternativas, validação e autor)</td><td class="ok">☒</td>
+      <td>Etapa 8.</td></tr>
+  <tr><td>Sem dados pessoais, chaves ou credenciais no repositório</td><td class="ok">☒</td>
+      <td>Base 100% sintética. O app não faz rede, não tem chave de API.
+      <code>local.properties</code> e <code>*.keystore</code> no <code>.gitignore</code>.</td></tr>
+  <tr><td>Sem defeitos críticos ou bloqueantes em aberto</td><td class="ok">☒</td>
+      <td>Três defeitos encontrados em teste e corrigidos: dois no quadro 7.2 e a queda por chave duplicada em 7.3.1. Nenhum em aberto.</td></tr>
+  <tr><td>Documentação da funcionalidade atualizada</td><td class="ok">☒</td>
+      <td>Este documento + <code>README.md</code> no repositório.</td></tr>
+</table>
+
+<h3>7.2 Defeitos encontrados em teste e corrigidos</h3>
+<table class="tab-compacta">
+  <tr><th style="width:5%">#</th><th style="width:30%">Sintoma observado</th><th>Causa raiz</th><th style="width:24%">Correção</th></tr>
+  <tr><td>1</td>
+      <td>O seletor de território não aparecia e a lista passava por baixo da barra superior.</td>
+      <td><code>StateView</code> aplicava o <code>modifier</code> (com o <em>padding</em> do
+      Scaffold) em carregando/vazio/erro, mas <strong>não</strong> no estado de sucesso.</td>
+      <td>Envolver o conteúdo de sucesso em um <code>Box(modifier)</code>. O <em>modifier</em>
+      agora vale para os quatro estados.</td></tr>
+  <tr><td>2</td>
+      <td>Mudar o território ou o modo de simulação em Configurações não refletia no painel ao
+      voltar.</td>
+      <td>O painel carregava uma única vez (<code>LaunchedEffect(Unit)</code>), que não torna a
+      disparar quando a tela volta da pilha de navegação.</td>
+      <td><code>LifecycleResumeEffect</code>: o painel recarrega a cada retomada, e uma nova carga
+      cancela a anterior.</td></tr>
+</table>
+
+<h3>7.3 Plano de evidências de qualidade</h3>
+<p><strong>Ambiente de medição:</strong> emulador Pixel (Medium Phone), Android API 36,
+<strong>APK release</strong> instalado, salvo onde indicado. A meta foi definida antes de medir.
+Marcas <code>TID_PERF</code> gravadas no logcat pelo próprio app.</p>
+
+<h4>Prova 1 — Tempo da carga inicial e tamanho da base</h4>
+<table class="tab-compacta">
+  <tr><th style="width:14%">Atributo</th><th style="width:20%">Meta</th><th style="width:24%">Como medir</th><th style="width:21%">ANTES</th><th>DEPOIS</th></tr>
+  <tr><td>Carga inicial (1ª execução, popular o banco)</td>
+      <td>≤ 1.000 ms</td>
+      <td><code>TID_PERF seed_ms</code> no logcat, após <code>pm clear</code>; 3 execuções antes,
+      5 depois</td>
+      <td class="num">396 / 330 / 320 ms<br><strong>média 348,7 · mediana 330</strong></td>
+      <td class="num">312 / 302 / 332 / 303 / 303 ms<br><strong class="melhor">média 310,4 · mediana 303</strong><br><span class="melhor">−11,0% na média</span></td></tr>
+  <tr><td>Tamanho do arquivo de leituras</td>
+      <td>Reduzir sem perder nenhuma leitura</td>
+      <td><code>ls -l app/src/main/assets/seed/readings.json</code></td>
+      <td class="num">816.818 bytes<br>(7.575 objetos JSON)</td>
+      <td class="num"><strong class="melhor">47.174 bytes</strong><br>(15 séries colunares)<br><span class="melhor">−94,2%</span></td></tr>
+  <tr><td>APK release</td><td>Não crescer</td><td><code>ls -l app-release.apk</code></td>
+      <td class="num">7.839.447 bytes</td>
+      <td class="num"><strong class="melhor">7.810.631 bytes</strong><br><span class="melhor">−28.816 bytes</span><br>
+      <span style="font-size:8pt;white-space:normal;display:block">entregue: 7.827.015 B
+      após a correção de 19/11</span></td></tr>
+</table>
+<div class="caixa">
+  <span class="titulo">O que foi otimizado, e por quê funcionou</span>
+  <p>O arquivo de leituras era uma lista de 7.575 objetos, cada um repetindo as mesmas cinco
+  chaves (<code>indicatorId</code>, <code>territoryId</code>, <code>hoursAgo</code>,
+  <code>value</code>, <code>origin</code>). Trocamos por um <strong>formato colunar</strong>: uma
+  entrada por par (indicador, território) — 15 ao todo — com os valores em um vetor e o instante
+  derivado de <code>startHoursAgo</code> + <code>stepHours</code>. <strong>As 7.575 leituras
+  continuam lá, byte a byte idênticas</strong>; o que sumiu foi a repetição das chaves. Além
+  disso, a carga inteira passou a entrar em <strong>uma única transação</strong>
+  (<code>TidDao.seedAll</code>), o que também a torna atômica.</p>
+  <p><strong>Leitura honesta do número:</strong> o arquivo encolheu 94%, mas o tempo caiu só 11%.
+  A medição mostrou que o gargalo <em>não</em> era o parse do JSON, e sim a gravação das 7.575
+  linhas no SQLite. É por isso que a meta de 1.000 ms já era atendida antes — e é exatamente o
+  tipo de conclusão que só a medição entrega.</p>
+</div>
+
+<h4>Prova 2 — Tempo até o painel ficar pronto</h4>
+<p>Mede o caso de uso completo: ler o Room, agregar os picos e rodar o motor de previsão para os
+5 indicadores. É o número que o usuário sente.</p>
+<table class="tab-compacta">
+  <tr><th style="width:14%">Cenário</th><th style="width:20%">Meta</th><th style="width:24%">Como medir</th><th style="width:21%">ANTES</th><th>DEPOIS</th></tr>
+  <tr><td>1ª abertura (logo após a carga inicial)</td><td rowspan="2">≤ 2.000 ms</td>
+      <td rowspan="2"><code>TID_PERF dashboard_ms</code> no logcat</td>
+      <td class="num">461 / 367 / 363 ms<br><strong>média 397,0</strong></td>
+      <td class="num">368 / 336 / 374 / 339 / 341 ms<br><strong class="melhor">média 351,6</strong><br><span class="melhor">−11,4%</span></td></tr>
+  <tr><td>Aberturas seguintes</td>
+      <td class="num">21 / 26 / 74 / 22 / 22 / 23 ms<br><strong>média 31,3 · mediana 22,5</strong></td>
+      <td class="num">17 / 26 / 23 / 24 / 20 / 21 / 25 / 20 ms<br><strong class="melhor">média 22,0</strong> · mediana 22,0<br><span class="melhor">−29,7% na média</span></td></tr>
+</table>
+<div class="caixa">
+  <span class="titulo">O que foi otimizado</span>
+  <p>Duas mudanças: (a) a janela de leitura caiu de <strong>21 para 15 dias</strong> — o motor usa
+  14 dias de picos, então tudo além disso era linha lida à toa (de ~2.520 para ~1.800 linhas por
+  carga); (b) os <strong>picos diários passaram a ser calculados uma única vez</strong> por
+  indicador e reaproveitados pelo motor de previsão e pelo KPI, em vez de duas.</p>
+  <p><strong>Leitura honesta do número:</strong> a média das aberturas seguintes caiu 30%, mas a
+  <em>mediana</em> praticamente não mudou (22,5 → 22,0 ms). O ganho na média vem de o pior caso
+  ter desaparecido (havia um 74 ms antes; depois o máximo é 26 ms). Ou seja: a otimização deixou o
+  tempo <strong>mais previsível</strong>, não dramaticamente menor — porque com 22 ms já não havia
+  o que ganhar contra uma meta de 2.000 ms. A folga final é de <strong>5,9×</strong> na 1ª
+  abertura e de <strong>90×</strong> nas seguintes.</p>
+</div>
+
+<h4>Prova 3 — Fluidez da rolagem (quadros perdidos)</h4>
+<table class="tab-compacta">
+  <tr><th style="width:14%">Atributo</th><th style="width:20%">Meta</th><th style="width:24%">Como medir</th><th style="width:21%">Build DEBUG</th><th>Build RELEASE (entregue)</th></tr>
+  <tr><td>Rolagem do painel</td>
+      <td>&lt; 5% de quadros perdidos<br>p95 do quadro ≤ 20 ms</td>
+      <td><code>dumpsys gfxinfo &lt;pkg&gt; reset</code> + 16 rolagens roteirizadas + leitura do
+      relatório</td>
+      <td class="num">754 quadros<br>28 perdidos = <strong>3,71%</strong><br>p50 17 ms · p95 18 ms</td>
+      <td class="num">757 quadros<br>27 perdidos = <strong class="ok">3,57%</strong><br>p50 17 ms · p95 <strong class="ok">18 ms</strong></td></tr>
+</table>
+<p>Medimos nos dois builds de propósito, porque o relatório de desempenho só vale na versão que
+vai para o usuário. O resultado confirma a meta (3,57% &lt; 5% e p95 de 18 ms contra o orçamento
+de 16,7 ms por quadro a 60 fps, com folga suficiente para não gerar travamento perceptível) e
+mostra que <strong>não houve regressão</strong> entre debug e release.</p>
+
+<h4>Prova 4 — Acessibilidade</h4>
+<table class="tab-compacta">
+  <tr><th style="width:20%">Critério</th><th style="width:16%">Meta</th><th style="width:26%">Como medir</th><th>Resultado medido</th></tr>
+  <tr><td>Contraste de todos os pares de cor</td><td>≥ 4,5:1</td>
+      <td>Fórmula de luminância relativa da WCAG 2.1 aplicada aos 17 pares da paleta (modo claro e
+      escuro)</td>
+      <td class="ok">Todos aprovados. Melhor par 16,66:1 (texto sobre superfície clara);
+      <strong>pior par 5,48:1</strong> (texto secundário no modo escuro). Semânticas: normal
+      8,57:1 · informativo 8,85:1 · atenção 7,19:1 · crítico 7,09:1.</td></tr>
+  <tr><td>Texto a 200%</td><td>Sem corte nem rolagem horizontal</td>
+      <td><code>adb shell settings put system font_scale 2.0</code> e reabertura do app</td>
+      <td class="ok">Aprovado. O texto reflui para várias linhas, os cartões crescem em altura e
+      nada é cortado (fig. 7).</td></tr>
+  <tr><td>Alvo de toque</td><td>≥ 48 dp</td>
+      <td>Token <code>Spacing.touchTarget</code> aplicado e conferido em cartões, botões, itens de
+      menu e opções</td><td class="ok">Aprovado em todos os elementos interativos.</td></tr>
+  <tr><td>Leitor de tela (TalkBack)</td><td>Todo elemento com descrição útil</td>
+      <td>Inspeção da árvore de acessibilidade</td>
+      <td class="ok"><code>KpiCard</code> e <code>AlertCard</code> expõem uma descrição única e
+      completa; o gráfico (Canvas), que seria invisível, expõe resumo textual com os valores-chave.</td></tr>
+  <tr><td>Cor nunca sozinha</td><td>100% dos alertas</td>
+      <td>Revisão visual dos quatro níveis</td>
+      <td class="ok">Todo nível aparece como cor + ícone + rótulo escrito.</td></tr>
+</table>
+
+<h4>Prova 5 — Estabilidade e testes</h4>
+<table class="tab-compacta">
+  <tr><th style="width:20%">Atributo</th><th style="width:16%">Meta</th><th style="width:26%">Como medir</th><th>Resultado</th></tr>
+  <tr><td>Falhas no fluxo principal</td><td>Zero</td>
+      <td><code>logcat AndroidRuntime:E</code> durante o roteiro completo no APK release</td>
+      <td class="ok">Nenhuma exceção registrada em nenhuma das execuções.</td></tr>
+  <tr><td>Testes de unidade</td><td>100% verdes, cobrindo os casos de <em>não</em> alertar</td>
+      <td><code>gradlew :app:testDebugUnitTest</code></td>
+      <td class="ok"><strong>16/16 aprovados.</strong> Doze no motor de previsão: atenção, crítico
+      com confirmação humana obrigatória, série estável sem alerta, dado vencido, histórico curto,
+      série vazia, justificativa completa, faixa da confiança, regressão linear exata, variação
+      semanal, agregação por pico diário e composição da série do gráfico. Mais quatro de regressão
+      (<code>DashboardKeysTest</code>) que fixam o contrato de chaves do painel, escritos a partir
+      do defeito descrito em 7.3.1.</td></tr>
+  <tr><td>Memória (PSS)</td><td>Estável durante a navegação</td>
+      <td><code>dumpsys meminfo</code> com o painel montado</td>
+      <td>46,6–51,0 MB nas medições. Sem crescimento entre navegações.</td></tr>
+</table>
+
+<h4>Revalidação independente (18/11/2026)</h4>
+<p>Oito dias após a construção, o <strong>mesmo APK entregue</strong>
+(SHA-256 <code class="mono">e68fd0cd…5d911c75</code>) foi reinstalado do zero
+(<code>pm clear</code> + <code>adb install</code>) em um emulador recém-inicializado, desta vez
+acelerado por <strong>WHPX</strong> em vez do driver AEHD usado na medição original. O objetivo era
+checar se os números do plano de evidências se reproduzem em outra configuração de máquina.</p>
+<table class="tab-compacta">
+  <tr><th style="width:30%">Medida</th><th style="width:23%">Original (AEHD)</th><th style="width:23%">Revalidação (WHPX)</th><th>Conclusão</th></tr>
+  <tr><td>Carga inicial (mediana)</td><td class="num">303 ms</td><td class="num">313 ms</td><td class="ok">reproduz</td></tr>
+  <tr><td>Painel, 1ª abertura (mediana)</td><td class="num">341 ms</td><td class="num">367 ms</td><td class="ok">reproduz</td></tr>
+  <tr><td>Painel, aberturas seguintes (mediana)</td><td class="num">22,0 ms</td><td class="num">20,0 ms</td><td class="ok">reproduz</td></tr>
+  <tr><td>Memória (PSS)</td><td class="num">49,8–51,0 MB</td><td class="num">46,6 MB</td><td class="ok">dentro da faixa revisada</td></tr>
+  <tr><td>Falhas no fluxo principal</td><td class="num">0</td><td class="num">0</td><td class="ok">reproduz</td></tr>
+</table>
+<div class="caixa">
+  <span class="titulo">Um detalhe que só a medição repetida revela</span>
+  <p>O <em>primeiro</em> lançamento sobre um emulador recém-bootado marcou 1.327 ms de carga
+  inicial e 1.482 ms até o painel — cerca de 4× o valor típico. A partir da segunda execução os
+  números voltaram à faixa normal. Ou seja, o pico é do ambiente esfriado (cache de página e JIT
+  frios), não do app. Registramos aqui porque a primeira execução de uma demonstração ao vivo cai
+  exatamente nesse caso: mesmo no pior cenário observado, a meta de 2.000 ms continua atendida.</p>
+</div>
+
+<h4>7.3.1 Defeito encontrado na produção do vídeo (19/11/2026)</h4>
+<p>Ao gravar o primeiro bloco do roteiro — rolar o painel até a seção
+<em>“Por que estes indicadores não geraram alerta”</em> — <strong>o app fechou sozinho</strong>.
+O <code>logcat</code> apontou a causa sem ambiguidade:</p>
+<div class="caixa critica">
+  <p class="mono" style="font-size:8.5pt">java.lang.IllegalArgumentException: Key "i-agua" was
+  already used. If you are using LazyColumn/Row please make sure you provide a unique key for each
+  item.</p>
+</div>
+<p>O painel é uma <strong>única</strong> <code>LazyColumn</code>. Um indicador que não gera alerta
+aparece nela <strong>duas vezes</strong>, de propósito: no cartão de KPI, porque o valor dele
+continua valendo, e na seção que explica o silêncio. As duas seções usavam o id do indicador como
+chave, então a lista tentava registrar <code>i-agua</code> duas vezes assim que as duas eram
+compostas juntas. Como o indicador silenciado é a regra em Jardim das Flores (água e serviços), o
+defeito era determinístico.</p>
+<p>Ele sobreviveu até aqui porque <strong>nenhuma medição anterior rolava a lista até o fim</strong>:
+as capturas e as marcas <code>TID_PERF</code> param no painel montado. Foi a gravação do vídeo —
+que percorre a tela inteira, como um avaliador faria — que exercitou o caminho. A correção é
+prefixar a chave com a seção (<code>alerta-</code>, <code>kpi-</code>, <code>silenciado-</code>),
+devolvendo a unicidade sem mudar o que a tela mostra.</p>
+<p>Medimos antes e depois com o mesmo roteiro (abrir o app e rolar até o fim da lista), três
+execuções de cada, em instalação limpa do APK release:</p>
+<table class="tab-compacta">
+  <tr><th style="width:34%">Medida</th><th style="width:22%">Antes</th><th style="width:22%">Depois</th><th>Conclusão</th></tr>
+  <tr><td>Quedas ao rolar até o fim</td>
+      <td class="num"><strong class="nok">3 de 3</strong></td>
+      <td class="num"><strong class="melhor">0 de 3</strong></td>
+      <td class="ok">corrigido</td></tr>
+  <tr><td>Execuções que alcançaram a seção do silêncio</td>
+      <td class="num"><strong class="nok">0 de 3</strong></td>
+      <td class="num"><strong class="melhor">3 de 3</strong></td>
+      <td class="ok">corrigido</td></tr>
+  <tr><td>Testes de unidade</td>
+      <td class="num">12</td>
+      <td class="num"><strong class="melhor">16</strong></td>
+      <td class="ok">+4 de regressão</td></tr>
+</table>
+<div class="caixa">
+  <span class="titulo">Por que isso vira teste, e não só conserto</span>
+  <p>Os quatro testes novos (<code>DashboardKeysTest</code>) não testam a interface: provam
+  <strong>no domínio</strong> que um indicador silenciado sai no KPI <em>e</em> na lista de
+  silenciados, que a chave crua portanto colide, e que a chave prefixada é única na lista inteira.
+  Rodam na JVM em segundos, junto com os outros doze. Se alguém reintroduzir a chave crua, a
+  <em>build</em> cai antes de chegar a um aparelho.</p>
+  <p>Registramos o episódio por honestidade de processo: a cobertura que tínhamos media desempenho
+  e caminhos de erro, mas não <strong>percorria</strong> a tela até o fim. O defeito não foi
+  encontrado por sorte — foi encontrado porque a produção do vídeo é, na prática, um teste de
+  aceitação manual do fluxo completo.</p>
+</div>
+</section>
+
+<section class="quebra">
+<h3>7.4 Evidências visuais</h3>
+<div class="galeria">
+  <figure class="tela"><img src="evidencias/01-painel.png" alt="Painel">
+    <figcaption>Fig. 3 — Painel com 3 alertas: crítico (clima), atenção (energia) e informativo
+    (resíduos), cada um com confiança e fonte.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/02-alerta-justificativa-topo.png" alt="Justificativa">
+    <figcaption>Fig. 4 — Justificativa obrigatória: 8 variáveis com valor, regra aplicada, período,
+    confiança e origem.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/03-grafico-projecao.png" alt="Gráfico">
+    <figcaption>Fig. 5 — Gráfico com ciclo diário, limiares e projeção tracejada; legenda textual
+    com os valores.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/04-decisao-sheet.png" alt="Decisão">
+    <figcaption>Fig. 6 — Registro da decisão humana. O aviso de alto impacto e a observação
+    obrigatória aparecem por ser alerta crítico.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/16-acessibilidade-fonte-200.png" alt="Fonte 200%">
+    <figcaption>Fig. 7 — Fonte do sistema a 200%: o texto reflui, nada é cortado.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/17-modo-escuro.png" alt="Modo escuro">
+    <figcaption>Fig. 8 — Modo escuro com paleta semântica própria, contraste mantido.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/08-permissao-negada-planoB.png" alt="Permissão negada">
+    <figcaption>Fig. 9 — Permissão negada: plano B na tela, o alerta permanece no painel.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/13-degradacao-desatualizado.png" alt="Dados vencidos">
+    <figcaption>Fig. 10 — Dado vencido: aviso explícito e alertas preditivos suspensos.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/12-degradacao-sem-dados.png" alt="Sem dados">
+    <figcaption>Fig. 11 — Dados ausentes: estado vazio com motivo e “Tentar novamente”.</figcaption></figure>
+  <figure class="tela"><img src="evidencias/10-historico-decisoes.png" alt="Histórico">
+    <figcaption>Fig. 12 — Rastreabilidade: ação, alerta, território, responsável, observação e
+    data.</figcaption></figure>
+</div>
+<p style="font-size:9pt;color:#3F4945">As 21 capturas completas, incluindo a notificação local
+entregue pelo sistema, o pedido de permissão, a validação do formulário e a falha de leitura,
+estão em <code>docs/evidencias/</code> no repositório.</p>
+
+<h3>7.5 Entregáveis</h3>
+<table class="tab-compacta">
+  <tr><th style="width:22%">Entregável</th><th>Onde está</th><th style="width:9%">Entregue</th></tr>
+  <tr><td>Documento PDF</td><td>Este arquivo, com diagramas e referências</td><td class="ok">☒</td></tr>
+  <tr><td>Repositório de código</td>
+      <td>Projeto Android completo com <code>README.md</code> (instalação, execução, arquitetura e
+      decisões); 36 arquivos Kotlin, ~4.400 linhas</td><td class="ok">☒</td></tr>
+  <tr><td>Build instalável</td>
+      <td><code>entrega/TerritoryIntelligenceDashboard-v1.0.0-release.apk</code> — 7,46 MB
+      (SHA-256 <code class="mono">6e0327db…9850d461</code>), <code>minSdk 24</code>,
+      <code>targetSdk 36</code>, testado no emulador Pixel API 36</td>
+      <td class="ok">☒</td></tr>
+  <tr><td>Dados sintéticos documentados</td>
+      <td><code>tools/gerar_dados_sinteticos.py</code> (semente fixa, origem, licença e finalidade
+      no cabeçalho) + <code>app/src/main/assets/seed/*.json</code></td><td class="ok">☒</td></tr>
+  <tr><td>Evidências de qualidade</td>
+      <td>Seção 7.3 — 6 provas medidas, 4 delas com antes e depois; 21 capturas em
+      <code>docs/evidencias/</code></td><td class="ok">☒</td></tr>
+  <tr><td>Registro de uso de IA</td><td>Etapa 8</td><td class="ok">☒</td></tr>
+  <tr><td>Vídeo demonstrativo</td>
+      <td><a href="https://youtube.com/shorts/3ebA_WhBFpw">youtube.com/shorts/3ebA_WhBFpw</a> —
+      2 min 48 s, 1080×2400, sem narração, gravado do APK entregue com o aparelho em
+      <strong>modo avião</strong>. Percorre os seis itens exigidos: painel, gráficos, alerta com
+      justificativa, decisão humana, dados ausentes e permissão negada. Roteiro em 8.2</td>
+      <td class="ok">☒</td></tr>
+  <tr><td>Referências</td><td>Seção final</td><td class="ok">☒</td></tr>
+</table>
+</section>
+
+<!-- ========================================================== ETAPA 8 -->
+<section class="quebra">
+<h2>Etapa 8 — Uso Responsável de IA e Roteiro de Defesa <span class="selo pontos">0,5 ponto</span></h2>
+
+<h3>8.1 Registro de uso de IA</h3>
+<div class="caixa">
+  <p><strong>Princípio que seguimos:</strong> a IA propõe, nós especificamos, revisamos e
+  justificamos. Gerar não é decidir. Nenhum trecho entrou no repositório sem um integrante que o
+  entendesse e assumisse a responsabilidade por ele.</p>
+</div>
+<table>
+  <tr><th style="width:18%">Item</th><th>Preenchimento da equipe</th></tr>
+  <tr><td><strong>Ferramenta e versão</strong></td>
+      <td>Claude (Anthropic), modelo Opus, usado via assistente de desenvolvimento no editor.</td></tr>
+  <tr><td><strong>Onde a IA ajudou</strong></td>
+      <td><strong>(a) Esqueleto de Composables</strong> — primeira versão de <code>KpiCard</code>,
+      <code>StateView</code> e <code>DecisionSheet</code>, a partir da nossa especificação de
+      parâmetros e callbacks.<br>
+      <strong>(b) Boilerplate</strong> — entidades e DAO do Room, mapeadores entidade↔domínio,
+      configuração do Gradle.<br>
+      <strong>(c) Desenho do Canvas</strong> do <code>TrendChart</code> (cálculo de escala e
+      caminho).<br>
+      <strong>(d) Comparação de alternativas</strong> — trade-offs de Hilt vs. container manual e
+      de DataStore vs. SharedPreferences, que viraram insumo das decisões da Etapa 6.<br>
+      <strong>(e) Redação</strong> — primeira versão de textos deste documento, revisada e
+      corrigida por nós.</td></tr>
+  <tr><td><strong>Especificação e alternativas</strong></td>
+      <td>Exemplo do prompt usado para o motor de previsão:<br>
+      <em>“Entrada: lista de leituras horárias com timestamp e valor, mais limiar de atenção e
+      limiar crítico. Saída: ou um alerta com nível, confiança de 0 a 1 e justificativa contendo
+      as variáveis usadas, a regra em texto, o período e a fonte; ou a recusa de emitir com o
+      motivo. Restrições: Kotlin puro, sem import de Android, determinístico, testável na JVM.
+      Pronto quando: existir teste para cada caso de não emissão. Proponha três métodos e compare
+      explicabilidade, custo e risco de falso positivo.”</em><br>
+      As três alternativas comparadas foram: <strong>(1) limiar simples sobre a última leitura</strong>
+      — trivial de explicar, mas dispara com qualquer pico isolado; <strong>(2) média móvel +
+      regressão linear sobre o pico diário</strong> — exige agregação, mas separa tendência de
+      ruído e é conferível à mão; <strong>(3) suavização exponencial com sazonalidade</strong> —
+      mais preciso, porém os parâmetros não são explicáveis para um gestor.
+      <strong>Escolhemos a (2)</strong>, pelo critério de explicabilidade na defesa, e
+      <strong>acrescentamos por conta própria</strong> o corte de aderência (R² &lt; 0,20 não
+      emite) — a IA não havia proposto esse limite, e ele é o que protege contra falso positivo.</td></tr>
+  <tr><td><strong>Como foi validado</strong></td>
+      <td><strong>(1) Teste automatizado:</strong> escrevemos os 12 testes do
+      <code>ForecastEngine</code>, inclusive os de não emissão, e os 4 de regressão do painel
+      (<code>DashboardKeysTest</code>). Todos rodam na JVM.<br>
+      <strong>(2) Conferência numérica passo a passo:</strong> as três etapas do método estão
+      presas a valores conferíveis no papel, com tolerância de 1e-9 — a regressão sobre
+      <code>[10, 20, 30, 40]</code> precisa devolver inclinação 10, intercepto 10 e R² igual a 1;
+      a variação semanal entre duas metades de 100 e 110 precisa dar 10%; e o pico diário de três
+      dias de leituras horárias precisa devolver exatamente o maior valor de cada dia. Quem
+      duvidar de um número da tela refaz a conta de cabeça e compara.<br>
+      <strong>(3) Execução real:</strong> todo fluxo rodado no emulador com o APK release,
+      incluindo os cenários de falha.<br>
+      <strong>(4) Revisão linha a linha</strong> em par, por camada.<br>
+      Três defeitos reais escaparam da geração e foram encontrados por nós <em>usando o app</em>:
+      dois no quadro 7.2 e, em 7.3.1, uma queda que só aparecia ao rolar o painel até o fim.
+      Nenhum dos três apareceu na leitura do código — todos apareceram no aparelho. Isso é a
+      melhor evidência de que a revisão não foi protocolar, e também do seu limite.</td></tr>
+  <tr><td><strong>Responsável por cada parte</strong></td>
+      <td><strong>Henrique Nogueira Boscoli (563651)</strong> — domínio: modelos,
+      <code>ForecastEngine</code>, casos de uso e testes. Revisor da camada de dados.<br>
+      <strong>Tomazzo Canterucci (565566)</strong> — dados e persistência: Room, DAO,
+      <code>SeedLoader</code>, repositório, gerador de dados sintéticos e plano de evidências.
+      Revisor da interface.<br>
+      <strong>João Henrique Queiroz Gil (563578)</strong> — interface: tema e tokens, os 7
+      Composables, as 5 telas, navegação, acessibilidade e adaptador de notificação. Revisor do
+      domínio.<br>
+      Cada integrante responde pela camada que escreveu e revisou a camada que não escreveu:
+      ninguém defende código que não sabe explicar.</td></tr>
+  <tr><td><strong>O que a IA não decide</strong></td>
+      <td>Definimos antes de começar que <strong>nunca</strong> seriam aceitos de IA sem decisão
+      humana explícita: <strong>(1)</strong> os limiares de atenção e crítico de cada indicador —
+      são o que define quem recebe alerta e quem não recebe; <strong>(2)</strong> a regra de
+      quando <em>não</em> emitir alerta; <strong>(3)</strong> a fronteira do que é decisão de alto
+      impacto e exige confirmação humana; <strong>(4)</strong> qualquer tratamento de dado pessoal
+      — por isso a base é 100% sintética; <strong>(5)</strong> o texto que o usuário lê em um
+      alerta crítico. Essas cinco coisas são o produto, não o código.</td></tr>
+</table>
+</section>
+
+<section>
+<h3>8.2 Roteiro de defesa (10 minutos)</h3>
+<p>Sequência: <strong>problema → decisão → prova</strong>. Começa pelo território, não pela tela.</p>
+<table>
+  <tr><th style="width:9%">Tempo</th><th style="width:20%">Bloco</th><th>O que apresentar</th></tr>
+  <tr><td><strong>2 min</strong></td><td>Problema e valor</td>
+      <td>“Dados de água, energia, clima, resíduos e serviços existem, mas estão espalhados e só
+      são consultados depois que o problema aconteceu.” Apresentar o gestor territorial em campo,
+      com pressa e sem internet. O risco que o app antecipa primeiro: <strong>sobrecarga de
+      energia em onda de calor</strong>. Por que importa: energia caindo em dia de 41 °C atinge
+      quem tem menos alternativa. <em>Não abrir o app ainda.</em></td></tr>
+  <tr><td><strong>3 min</strong></td><td>Decisão de arquitetura</td>
+      <td>Mostrar a Figura 2 (camadas). Frase-âncora: <em>“o domínio não tem um único import de
+      Android — é por isso que 16 testes rodam na JVM em segundos.”</em> Apresentar o
+      <strong>ADR-001</strong>: descartamos Flutter e React Native; o critério foi <em>iOS fora do
+      escopo + recurso nativo no caminho crítico + experiência da equipe</em>; o custo assumido é
+      <em>não existe app para iOS</em>. Fechar com a substituição: trocar a base sintética por uma
+      API pública real é escrever outra implementação de <code>TerritoryRepository</code> — o
+      domínio não muda.</td></tr>
+  <tr><td><strong>3 min</strong></td><td>Demonstração real<br><em>(no aparelho)</em></td>
+      <td><strong>1.</strong> Abrir o app — painel já montado, <strong>com o Wi-Fi desligado</strong>.
+      Apontar a faixa “Dado sintético · última atualização”.<br>
+      <strong>2.</strong> Três alertas em um território, ordenados por gravidade.<br>
+      <strong>3.</strong> Abrir o de energia → <strong>a justificativa</strong>: oito variáveis com
+      valor, a regra em texto, a confiança de 72% e a fonte. Dizer: <em>“nenhum alerta aparece sem
+      isto — o modelo de domínio não permite.”</em><br>
+      <strong>4.</strong> Gráfico: ciclo diário, os dois limiares e a projeção tracejada.<br>
+      <strong>5.</strong> Registrar a decisão: tentar confirmar <em>sem</em> responsável → o app
+      recusa. Preencher, acatar, mostrar no histórico com data e nome.<br>
+      <strong>6. A falha prevista.</strong> Tocar em notificar → <strong>negar</strong> a permissão
+      → plano B na tela. Depois, em Configurações, ligar “Simular dados desatualizados” → voltar
+      ao painel → aviso de dado vencido e <strong>alertas suspensos</strong>. Fechar com “Simular
+      falha de leitura” → mensagem clara e “Tentar novamente”.</td></tr>
+  <tr><td><strong>2 min</strong></td><td>Riscos e próximos passos</td>
+      <td><strong>Três riscos declarados:</strong> (1) falso positivo — mitigado pelo corte de
+      aderência, mas não eliminado; (2) falso negativo em evento abrupto — a regra é linear e não
+      captura rompimento ou apagão; (3) limiar mal calibrado gera alerta desigual entre
+      territórios — por isso os limiares são visíveis e auditáveis em Configurações.<br>
+      <strong>Fora do escopo:</strong> iOS, servidor, dados reais em produção.<br>
+      <strong>Roadmap:</strong> (a) sazonalidade semanal no motor para reduzir falso negativo;
+      (b) uma implementação de <code>TerritoryRepository</code> consumindo dados abertos reais, com
+      sincronização e política de cache; (c) exportar o histórico de decisões em CSV para
+      prestação de contas.</td></tr>
+</table>
+
+<div class="caixa critica">
+  <span class="titulo">Perguntas que a banca provavelmente fará — e a resposta curta</span>
+  <p><strong>“Por que não usaram IA de verdade na previsão?”</strong> Porque o requisito é apoio à
+  decisão humana: o gestor precisa poder conferir e contestar o alerta. Uma reta com R² declarado
+  se confere com os números da própria tela; um modelo opaco, não. É uma escolha de produto, não
+  limitação técnica.</p>
+  <p><strong>“O gráfico diz 908,6 kWh/h e o alerta diz 1.045,7. Não é contradição?”</strong> São
+  dois horizontes diferentes, e ambos estão rotulados: o tracejado é a projeção <em>horária de
+  curto prazo</em> (próximas 12 h, a partir da leitura atual, que está no vale do ciclo); o alerta
+  projeta o <em>pico diário</em> para 48 h. O risco está no pico.</p>
+  <p><strong>“O APK está assinado com chave de debug.”</strong> Sim, por decisão consciente, para
+  ser instalável na avaliação — está declarado no quadro 6.1. Uma entrega de produção usaria uma
+  chave de release guardada fora do repositório.</p>
+  <p><strong>“Os dados são falsos.”</strong> São sintéticos, gerados por script com semente fixa,
+  licença e finalidade documentadas — e o app diz isso em todas as telas. Trocar por fonte real é
+  uma nova implementação do repositório, sem tocar no domínio.</p>
+</div>
+</section>
+
+<!-- ======================================================== CHECKLIST -->
+<section class="quebra">
+<h2>Checklist final</h2>
+<table class="tab-compacta">
+  <tr><th style="width:5%"></th><th style="width:28%">Item</th><th>Onde está</th></tr>
+  <tr><td class="ok">☒</td><td>Capa</td><td>Página 1</td></tr>
+  <tr><td class="ok">☒</td><td>Integrantes</td><td>Capa — 3 integrantes com RM</td></tr>
+  <tr><td class="ok">☒</td><td>Documento de Visão</td><td>Etapa 1 — objetivo, problema, público, benefícios, As-Is/To-Be, papéis, princípios, 8 RF e 6 RNF</td></tr>
+  <tr><td class="ok">☒</td><td>Arquitetura e Blueprint</td><td>Etapa 2 — abordagem justificada, blueprint por requisito e 2 diagramas</td></tr>
+  <tr><td class="ok">☒</td><td>Estado e Persistência</td><td>Etapa 3 — estado, fontes, persistência, modelo de dados e recursos nativos</td></tr>
+  <tr><td class="ok">☒</td><td>Identidade Visual e Componentes</td><td>Etapa 4 — tokens, acessibilidade medida, 7 Composables e 5 telas</td></tr>
+  <tr><td class="ok">☒</td><td>Alertas e Decisão Humana</td><td>Etapa 5 — método, níveis, justificativa, confiança, limites e ética</td></tr>
+  <tr><td class="ok">☒</td><td>ADR</td><td>Etapa 6 — ADR-001 + 6 decisões com alternativa, critério e custo</td></tr>
+  <tr><td class="ok">☒</td><td>Definition of Done</td><td>Seção 7.1 — 11 critérios com evidência</td></tr>
+  <tr><td class="ok">☒</td><td>Plano de Evidências (mín. 3 provas)</td><td>Seção 7.3 — 6 provas, 4 com números antes e depois</td></tr>
+  <tr><td class="ok">☒</td><td>Uso Responsável de IA</td><td>Seção 8.1 — ferramenta, prompt, 3 alternativas, validação e responsável</td></tr>
+  <tr><td class="ok">☒</td><td>Roteiro de defesa</td><td>Seção 8.2 — 10 minutos em 4 blocos</td></tr>
+  <tr><td class="ok">☒</td><td>Repositório e Build instalável (APK)</td><td><code>entrega/TerritoryIntelligenceDashboard-v1.0.0-release.apk</code></td></tr>
+  <tr><td class="ok">☒</td><td>Vídeo demonstrativo</td>
+      <td><a href="https://youtube.com/shorts/3ebA_WhBFpw">youtube.com/shorts/3ebA_WhBFpw</a> —
+      2 min 48 s, sem narração, em modo avião, com os seis itens exigidos</td></tr>
+  <tr><td class="ok">☒</td><td>Referências</td><td>A seguir</td></tr>
+</table>
+
+<h2>Referências</h2>
+<h4>Fontes de dados</h4>
+<ul>
+  <li><strong>Base sintética própria</strong> — <code>tools/gerar_dados_sinteticos.py</code>,
+  semente fixa 2026, licença de uso acadêmico livre (GS2026.2). Única fonte de dados do app.</li>
+  <li>ONS — Operador Nacional do Sistema Elétrico. Dados abertos de curva de carga.
+  Usado apenas como <em>referência de ordem de grandeza</em> na calibração do indicador de
+  energia; nenhuma série foi copiada. <span class="mono">ons.org.br/paginas/resultados-da-operacao</span></li>
+  <li>SNIS — Sistema Nacional de Informações sobre Saneamento. Referência de ordem de grandeza
+  para o indicador de água. <span class="mono">snis.gov.br</span></li>
+  <li>INMET — Instituto Nacional de Meteorologia. Referência de ordem de grandeza para o
+  indicador de clima. <span class="mono">portal.inmet.gov.br/dadoshistoricos</span></li>
+</ul>
+<h4>Bibliotecas e ferramentas</h4>
+<ul>
+  <li>Jetpack Compose (BOM 2025.08.00) e Material 3 — interface declarativa e sistema de tema.</li>
+  <li>AndroidX Lifecycle 2.9.2 — <code>ViewModel</code>, <code>StateFlow</code>,
+  <code>collectAsStateWithLifecycle</code> e <code>LifecycleResumeEffect</code>.</li>
+  <li>Navigation Compose 2.9.3 — mapa de rotas.</li>
+  <li>Room 2.8.5 com KSP — persistência local sobre SQLite.</li>
+  <li>Kotlin 2.2.20, Android Gradle Plugin 8.13.0, Gradle 8.14.3.</li>
+  <li>JUnit 4.13.2 — testes de unidade do domínio.</li>
+  <li><code>dumpsys gfxinfo</code> e <code>dumpsys meminfo</code> (Android Platform Tools) —
+  medições de quadros e memória.</li>
+</ul>
+<h4>Documentação consultada</h4>
+<ul>
+  <li>Android Developers — <em>Guide to app architecture</em>, <em>State and Jetpack Compose</em>,
+  <em>Notification runtime permission</em> e <em>Accessibility in Compose</em>.</li>
+  <li>W3C — <em>Web Content Accessibility Guidelines (WCAG) 2.1</em>, critério 1.4.3
+  (contraste mínimo), usado para calcular os 17 pares da paleta.</li>
+  <li>Material Design 3 — <em>Color roles</em> e <em>Accessibility: touch targets</em>.</li>
+  <li>Michael Nygard — <em>Documenting Architecture Decisions</em> (formato do ADR).</li>
+</ul>
+
+<div class="caixa" style="margin-top:20pt">
+  <span class="titulo">Como reproduzir tudo isto</span>
+  <p><code>git clone</code> → abrir no Android Studio → <code>./gradlew :app:assembleRelease</code>
+  gera o APK; <code>./gradlew :app:testDebugUnitTest</code> roda os 16 testes de unidade;
+  <code>python tools/gerar_dados_sinteticos.py</code> regenera a base idêntica (semente fixa).
+  Instruções completas no <code>README.md</code>.</p>
+</div>
+
+<p style="text-align:center;margin-top:24pt;font-size:9pt;color:#3F4945">
+GS2026.2 · Global Solution · Cross-Platform Application Development · FIAP<br>
+Henrique Nogueira Boscoli (563651) · Tomazzo Canterucci (565566) · João Henrique Queiroz Gil (563578)
+</p>
+</section>
+
+</body>
+</html>
